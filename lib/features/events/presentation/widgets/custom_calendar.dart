@@ -21,8 +21,18 @@ class _CustomCalendarState extends State<CustomCalendar> {
 
   String _getMonthName(int month) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     return months[month - 1];
   }
@@ -127,6 +137,10 @@ class _CustomCalendarState extends State<CustomCalendar> {
                 _selectedDate!.month == date.month &&
                 _selectedDate!.day == date.day;
 
+            final isToday = DateTime.now().year == date.year &&
+                DateTime.now().month == date.month &&
+                DateTime.now().day == date.day;
+
             final dayEvents = widget.events.where((event) =>
                 event.startDateTime.year == date.year &&
                 event.startDateTime.month == date.month &&
@@ -144,7 +158,11 @@ class _CustomCalendarState extends State<CustomCalendar> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue : null,
+                      color: isSelected
+                          ? Colors.blue
+                          : (isToday)
+                              ? Colors.grey[300]
+                              : null,
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
@@ -152,9 +170,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
                       "${date.day}",
                       style: TextStyle(
                         color: isSelected ? Colors.white : Colors.black,
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                   ),

@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
 import '../widgets/custom_calendar.dart';
 import 'event_form_page.dart';
-import 'event_details_page.dart';
 import '../../domain/repositories/event_repository.dart';
 import '../../data/repositories/event_repository_impl.dart';
+import '../widgets/event_list.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -62,7 +62,7 @@ class _CalendarPageState extends State<CalendarPage> {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       await _eventRepository.insertSampleData();
       final events = await _eventRepository.getEvents();
@@ -102,55 +102,55 @@ class _CalendarPageState extends State<CalendarPage> {
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : Column(
-            children: [
-              Text(
-                _dayOfWeek,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _formattedDate,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(width: 8),
-                  DropdownButton(
-                    value: _selectedDate.year,
-                    items: [
-                      for (var year = 1950; year <= 2950; year++)
-                        DropdownMenuItem(
-                          value: year,
-                          child: Text(
-                            '$year',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
+                  children: [
+                    Text(
+                      _dayOfWeek,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _formattedDate,
+                          style: const TextStyle(fontSize: 16),
                         ),
-                    ],
-                    isDense: true,
-                    underline: Container(),
-                    dropdownColor: Colors.white,
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _selectedDate = DateTime(
-                            value,
-                            _selectedDate.month,
-                            _selectedDate.day,
-                          );
-                        });
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
+                        const SizedBox(width: 8),
+                        DropdownButton(
+                          value: _selectedDate.year,
+                          items: [
+                            for (var year = 1950; year <= 2950; year++)
+                              DropdownMenuItem(
+                                value: year,
+                                child: Text(
+                                  '$year',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                          ],
+                          isDense: true,
+                          underline: Container(),
+                          dropdownColor: Colors.white,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedDate = DateTime(
+                                  value,
+                                  _selectedDate.month,
+                                  _selectedDate.day,
+                                );
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
         ),
         actions: [
           Stack(
@@ -222,7 +222,8 @@ class _CalendarPageState extends State<CalendarPage> {
                                         MaterialPageRoute(
                                           builder: (context) => EventFormPage(
                                             onEventSaved: (event) async {
-                                              await _eventRepository.addEvent(event);
+                                              await _eventRepository
+                                                  .addEvent(event);
                                               _loadEvents();
                                             },
                                             selectedDate: _selectedDate,
@@ -247,112 +248,17 @@ class _CalendarPageState extends State<CalendarPage> {
                             const SizedBox(height: 8),
                             SizedBox(
                               height: constraints.maxHeight,
-                              child: eventsForSelectedDate.isEmpty
-                                  ? Text(
-                                    'No events for this day',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
-                                    ),
-                                  )
-                                  : ListView.builder(
-                                      itemCount: eventsForSelectedDate.length,
-                                      itemBuilder: (context, index) {
-                                        final event = eventsForSelectedDate[index];
-                                        return Container(
-                                          margin: const EdgeInsets.only(bottom: 12),
-                                          decoration: BoxDecoration(
-                                            color: event.color.withAlpha(60),
-                                            borderRadius: BorderRadius.circular(12),
-                                            border: Border.all(
-                                              color: event.color.withAlpha(120),
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: ListTile(
-                                            contentPadding: const EdgeInsets.all(16),
-                                            title: Text(
-                                              event.title,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: event.color,
-                                                  ),
-                                            ),
-                                            subtitle: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  event.description,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall
-                                                      ?.copyWith(color: event.color),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.access_time_filled,
-                                                      size: 16,
-                                                      color: event.color,
-                                                    ),
-                                                    const SizedBox(width: 4),
-                                                    Text(
-                                                      event.timeRange,
-                                                      style: TextStyle(
-                                                        color: event.color,
-                                                        fontSize: 12,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 16),
-                                                    if (event.location != null &&
-                                                        event.location!.isNotEmpty) ...[
-                                                      Icon(
-                                                        Icons.location_on,
-                                                        size: 16,
-                                                        color: event.color,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        event.location!,
-                                                        style: TextStyle(
-                                                          color: event.color,
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => EventDetailsPage(
-                                                    event: event,
-                                                    onEventDeleted: () async {
-                                                      await _eventRepository.deleteEvent(event.id!);
-                                                      _loadEvents();
-                                                    },
-                                                    onEventUpdated: (updatedEvent) async {
-                                                      await _eventRepository.updateEvent(updatedEvent);
-                                                      _loadEvents();
-                                                    },
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    ),
+                              child: EventList(
+                                events: eventsForSelectedDate,
+                                onEventDeleted: () async {
+                                  _loadEvents();
+                                },
+                                onEventUpdated: (updatedEvent) async {
+                                  await _eventRepository
+                                      .updateEvent(updatedEvent);
+                                  _loadEvents();
+                                },
+                              ),
                             ),
                           ],
                         ),

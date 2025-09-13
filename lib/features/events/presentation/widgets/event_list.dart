@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+import '../../domain/entities/event.dart';
+import '../pages/event_details_page.dart';
+
+class EventList extends StatelessWidget {
+  final List<Event> events;
+  final VoidCallback onEventDeleted;
+  final Function(Event) onEventUpdated;
+
+  const EventList({
+    super.key,
+    required this.events,
+    required this.onEventDeleted,
+    required this.onEventUpdated,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (events.isEmpty) {
+      return const Center(
+        child: Text(
+          'No events for this day',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: events.length,
+      itemBuilder: (context, index) {
+        final event = events[index];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: event.color.withAlpha(60),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: event.color.withAlpha(120),
+              width: 1,
+            ),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            title: Text(
+              event.title,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: event.color,
+                  ),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.description,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: event.color),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time_filled,
+                      size: 16,
+                      color: event.color,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      event.timeRange,
+                      style: TextStyle(
+                        color: event.color,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    if (event.location != null &&
+                        event.location!.isNotEmpty) ...[
+                      Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: event.color,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        event.location!,
+                        style: TextStyle(
+                          color: event.color,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EventDetailsPage(
+                    event: event,
+                    onEventDeleted: onEventDeleted,
+                    onEventUpdated: onEventUpdated,
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
