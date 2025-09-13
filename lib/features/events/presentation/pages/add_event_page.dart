@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
+import '../../../../core/services/notification_service.dart';
 
 class AddEventPage extends StatefulWidget {
   final Function(Event) onEventAdded;
@@ -23,8 +24,18 @@ class _AddEventPageState extends State<AddEventPage> {
   Color _selectedColor = Colors.blue;
   TimeOfDay _startTime = TimeOfDay.now();
   TimeOfDay _endTime = TimeOfDay.now();
+  int _reminderTime = 15;
 
   final _colorOptions = [Colors.blue, Colors.orange, Colors.red];
+  final _reminderOptions = {
+    5: '5 minutes before',
+    10: '10 minutes before',
+    15: '15 minutes before',
+    30: '30 minutes before',
+    60: '1 hour before',
+    120: '2 hours before',
+    1440: '1 day before',
+  };
 
   DateTime combineDateAndTime(DateTime date, TimeOfDay time) {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
@@ -124,7 +135,8 @@ class _AddEventPageState extends State<AddEventPage> {
                 alignment: Alignment.center,
                 underline: Container(),
                 dropdownColor: Colors.white,
-                items: _colorOptions.map<DropdownMenuItem<Color>>((Color color) {
+                items:
+                    _colorOptions.map<DropdownMenuItem<Color>>((Color color) {
                   return DropdownMenuItem<Color>(
                     value: color,
                     child: Container(width: 20, height: 20, color: color),
@@ -191,18 +203,55 @@ class _AddEventPageState extends State<AddEventPage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              const Text('Reminder',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: DropdownButton<int>(
+                  value: _reminderTime,
+                  onChanged: (int? newValue) {
+                    setState(() {
+                      _reminderTime = newValue!;
+                    });
+                  },
+                  isExpanded: true,
+                  dropdownColor: Colors.white,
+                  underline: Container(),
+                  items: _reminderOptions.entries
+                      .map<DropdownMenuItem<int>>((entry) {
+                    return DropdownMenuItem<int>(
+                      value: entry.key,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.notifications,
+                              color: Colors.blue, size: 20),
+                          const SizedBox(width: 8),
+                          Text(entry.value),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
               const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_nameController.text.isNotEmpty) {
                       final start =
                           combineDateAndTime(widget.selectedDate, _startTime);
                       final end =
                           combineDateAndTime(widget.selectedDate, _endTime);
-          
+
                       if (end.isBefore(start)) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -211,7 +260,7 @@ class _AddEventPageState extends State<AddEventPage> {
                         );
                         return;
                       }
-          
+
                       final event = Event(
                         id: DateTime.now().millisecondsSinceEpoch,
                         title: _nameController.text,
@@ -220,8 +269,18 @@ class _AddEventPageState extends State<AddEventPage> {
                         startDateTime: start,
                         endDateTime: end,
                         color: _selectedColor,
+                        reminderTime: _reminderTime,
                       );
-          
+
+                      // Schedule notification
+                      await NotificationService().scheduleEventReminder(
+                        eventId: event.id!,
+                        eventTitle: event.title,
+                        eventDescription: event.description,
+                        eventStartTime: event.startDateTime,
+                        reminderMinutes: event.reminderTime,
+                      );
+
                       widget.onEventAdded(event);
                       Navigator.pop(context);
                     }

@@ -10,6 +10,7 @@ class EventModel extends Event {
     required super.color,
     required super.startDateTime,
     required super.endDateTime,
+    super.reminderTime = 15,
   });
 
   factory EventModel.fromMap(Map<String, dynamic> map) {
@@ -21,6 +22,7 @@ class EventModel extends Event {
       color: map['color'],
       startDateTime: map['startDateTime'],
       endDateTime: map['endDateTime'],
+      reminderTime: map['reminderTime'] as int? ?? 15,
     );
   }
 
@@ -33,6 +35,7 @@ class EventModel extends Event {
       'color': color,
       'startDateTime': startDateTime,
       'endDateTime': endDateTime,
+      'reminderTime': reminderTime,
     };
   }
 }

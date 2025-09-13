@@ -132,7 +132,7 @@ class EventDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    event.reminderTime,
+                    event.reminderTimeFormatted,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -156,7 +156,8 @@ class EventDetailsPage extends StatelessWidget {
                   ),
                   const Spacer(),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 32),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 32),
                     child: SizedBox(
                       width: double.infinity,
                       height: 56,

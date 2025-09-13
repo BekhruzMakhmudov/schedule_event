@@ -19,8 +19,9 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
   }
 
@@ -28,12 +29,22 @@ class AppDatabase {
     await db.execute('''
       CREATE TABLE events(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
+        title TEXT NOT NULL,
         description TEXT,
         location TEXT,
-        priorityColor TEXT,
-        date TEXT
+        color INTEGER NOT NULL,
+        startDateTime INTEGER NOT NULL,
+        endDateTime INTEGER NOT NULL,
+        reminderTime INTEGER DEFAULT 15
       )
     ''');
+  }
+
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Drop old table and recreate with new schema
+      await db.execute('DROP TABLE IF EXISTS events');
+      await _createDB(db, newVersion);
+    }
   }
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_event/features/events/presentation/pages/calendar_page.dart';
+import 'package:schedule_event/core/services/notification_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().initialize();
   runApp(const MyApp());
 }
 
