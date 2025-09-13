@@ -2,29 +2,32 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
 import '../../../../core/services/notification_service.dart';
 
-class AddEventPage extends StatefulWidget {
-  final Function(Event) onEventAdded;
-  final DateTime selectedDate;
+class EventFormPage extends StatefulWidget {
+  final Event? event; // null for add, existing event for edit
+  final Function(Event) onEventSaved;
+  final DateTime? selectedDate; // required for add, optional for edit
 
-  const AddEventPage({
+  const EventFormPage({
     super.key,
-    required this.onEventAdded,
-    required this.selectedDate,
-  });
+    this.event,
+    required this.onEventSaved,
+    this.selectedDate,
+  }) : assert(event != null || selectedDate != null, 
+         'Either event (for edit) or selectedDate (for add) must be provided');
 
   @override
-  State<AddEventPage> createState() => _AddEventPageState();
+  State<EventFormPage> createState() => _EventFormPageState();
 }
 
-class _AddEventPageState extends State<AddEventPage> {
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _locationController = TextEditingController();
+class _EventFormPageState extends State<EventFormPage> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _locationController;
 
-  Color _selectedColor = Colors.blue;
-  TimeOfDay _startTime = TimeOfDay.now();
-  TimeOfDay _endTime = TimeOfDay.now();
-  int _reminderTime = 15;
+  late Color _selectedColor;
+  late TimeOfDay _startTime;
+  late TimeOfDay _endTime;
+  late int _reminderTime;
 
   final _colorOptions = [Colors.blue, Colors.orange, Colors.red];
   final _reminderOptions = {
@@ -37,9 +40,59 @@ class _AddEventPageState extends State<AddEventPage> {
     1440: '1 day before',
   };
 
+  bool get isEditing => widget.event != null;
+  String get pageTitle => isEditing ? 'Edit Event' : 'Add Event';
+  String get buttonText => isEditing ? 'Update Event' : 'Add Event';
+
+  @override
+  void initState() {
+    super.initState();
+    
+    if (isEditing) {
+      // Initialize with existing event data
+      final event = widget.event!;
+      _nameController = TextEditingController(text: event.title);
+      _descriptionController = TextEditingController(text: event.description);
+      _locationController = TextEditingController(text: event.location ?? '');
+      
+      _selectedColor = event.color;
+      _startTime = TimeOfDay.fromDateTime(event.startDateTime);
+      _endTime = TimeOfDay.fromDateTime(event.endDateTime);
+      _reminderTime = event.reminderTime;
+    } else {
+      // Initialize with default values for new event
+      _nameController = TextEditingController();
+      _descriptionController = TextEditingController();
+      _locationController = TextEditingController();
+      
+      _selectedColor = Colors.blue;
+      _startTime = TimeOfDay.now();
+      _endTime = TimeOfDay.now();
+      _reminderTime = 15;
+    }
+  }
+
+
+  String _colorToString(Color color) {
+    if (color == Colors.blue) return 'blue';
+    if (color == Colors.red) return 'red';
+    if (color == Colors.orange) return 'orange';
+    return 'blue'; // default
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
+
   DateTime combineDateAndTime(DateTime date, TimeOfDay time) {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
+
+  DateTime get eventDate => isEditing ? widget.event!.startDateTime : widget.selectedDate!;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +108,7 @@ class _AddEventPageState extends State<AddEventPage> {
             Navigator.pop(context);
           },
         ),
+        title: Text(pageTitle),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -247,10 +301,8 @@ class _AddEventPageState extends State<AddEventPage> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_nameController.text.isNotEmpty) {
-                      final start =
-                          combineDateAndTime(widget.selectedDate, _startTime);
-                      final end =
-                          combineDateAndTime(widget.selectedDate, _endTime);
+                      final start = combineDateAndTime(eventDate, _startTime);
+                      final end = combineDateAndTime(eventDate, _endTime);
 
                       if (end.isBefore(start)) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -261,18 +313,27 @@ class _AddEventPageState extends State<AddEventPage> {
                         return;
                       }
 
+                      final eventId = isEditing 
+                          ? widget.event!.id 
+                          : DateTime.now().millisecondsSinceEpoch;
+
                       final event = Event(
-                        id: DateTime.now().millisecondsSinceEpoch,
+                        id: eventId,
                         title: _nameController.text,
                         description: _descriptionController.text,
                         location: _locationController.text,
                         startDateTime: start,
                         endDateTime: end,
-                        color: _selectedColor,
+                        colorName: _colorToString(_selectedColor),
                         reminderTime: _reminderTime,
                       );
 
-                      // Schedule notification
+                      // Handle notifications
+                      if (isEditing) {
+                        // Cancel old notification and schedule new one
+                        await NotificationService().cancelNotification(widget.event!.id!);
+                      }
+                      
                       await NotificationService().scheduleEventReminder(
                         eventId: event.id!,
                         eventTitle: event.title,
@@ -281,7 +342,7 @@ class _AddEventPageState extends State<AddEventPage> {
                         reminderMinutes: event.reminderTime,
                       );
 
-                      widget.onEventAdded(event);
+                      widget.onEventSaved(event);
                       Navigator.pop(context);
                     }
                   },
@@ -291,9 +352,9 @@ class _AddEventPageState extends State<AddEventPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Add',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  child: Text(
+                    buttonText,
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),
               ),

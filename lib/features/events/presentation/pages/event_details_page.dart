@@ -1,22 +1,38 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/event.dart';
+import 'event_form_page.dart';
 
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsPage extends StatefulWidget {
   final Event event;
   final VoidCallback onEventDeleted;
+  final Function(Event)? onEventUpdated;
 
   const EventDetailsPage({
     super.key,
     required this.event,
     required this.onEventDeleted,
+    this.onEventUpdated,
   });
+
+  @override
+  State<EventDetailsPage> createState() => _EventDetailsPageState();
+}
+
+class _EventDetailsPageState extends State<EventDetailsPage> {
+  late Event currentEvent;
+
+  @override
+  void initState() {
+    super.initState();
+    currentEvent = widget.event;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: event.color,
+        backgroundColor: currentEvent.color,
         leading: InkWell(
           child: Container(
             margin: const EdgeInsets.only(left: 24),
@@ -30,7 +46,24 @@ class EventDetailsPage extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EventFormPage(
+                    event: currentEvent,
+                    onEventSaved: (updatedEvent) {
+                      setState(() {
+                        currentEvent = updatedEvent;
+                      });
+                      if (widget.onEventUpdated != null) {
+                        widget.onEventUpdated!(updatedEvent);
+                      }
+                    },
+                  ),
+                ),
+              );
+            },
             child: Row(
               children: [
                 Icon(Icons.edit, color: Colors.white),
@@ -53,7 +86,7 @@ class EventDetailsPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: event.color,
+              color: currentEvent.color,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),
@@ -63,7 +96,7 @@ class EventDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  event.title,
+                  currentEvent.title,
                   style: Theme.of(context)
                       .textTheme
                       .headlineLarge
@@ -71,7 +104,7 @@ class EventDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  event.description,
+                  currentEvent.description,
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
@@ -87,7 +120,7 @@ class EventDetailsPage extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      event.timeRange,
+                      currentEvent.timeRange,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -96,7 +129,7 @@ class EventDetailsPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                if (event.location!.isNotEmpty)
+                if (currentEvent.location!.isNotEmpty)
                   Row(
                     children: [
                       const Icon(
@@ -106,7 +139,7 @@ class EventDetailsPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        event.location!,
+                        currentEvent.location!,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -132,7 +165,7 @@ class EventDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    event.reminderTimeFormatted,
+                    currentEvent.reminderTimeFormatted,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -148,7 +181,7 @@ class EventDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus vel ex ut orci rhoncus aliquam non eget elit. Etiam pulvinar est mi, ut porta magna consequat nec. Ut vitae urna nisl. Integer gravida sollicitudin massa, ut congue orci posuere sit amet. Aenean laceret eueros est, ut auctor nulla suscipit non.',
+                    currentEvent.description.isNotEmpty ? currentEvent.description : 'No description provided',
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
@@ -176,7 +209,7 @@ class EventDetailsPage extends StatelessWidget {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    onEventDeleted();
+                                    widget.onEventDeleted();
                                     Navigator.pop(context);
                                     Navigator.pop(context);
                                   },

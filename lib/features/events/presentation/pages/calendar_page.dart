@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
 import '../widgets/custom_calendar.dart';
-import 'add_event_page.dart';
+import 'event_form_page.dart';
 import 'event_details_page.dart';
+import '../../domain/repositories/event_repository.dart';
+import '../../data/repositories/event_repository_impl.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -15,33 +17,9 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   DateTime _selectedDate = DateTime.now();
-  final List<Event> _events = [
-    Event(
-      id: 1,
-      title: 'Watching Football',
-      description: 'Manchester United vs Arsenal (Premier League)',
-      location: 'Stamford Bridge',
-      startDateTime: DateTime.parse("2025-09-28 17:00:00"),
-      endDateTime: DateTime.parse("2025-09-28 18:30:00"),
-      color: Colors.blue,
-    ),
-    Event(
-      id: 2,
-      title: 'Deadline Project UI Website',
-      description: 'Flutter Page Card and Wishlist',
-      startDateTime: DateTime.parse("2025-09-28 21:00:00"),
-      endDateTime: DateTime.parse("2025-09-28 22:30:00"),
-      color: Colors.red,
-    ),
-    Event(
-      id: 3,
-      title: 'Meeting Client (Japan)',
-      description: 'Android App and website online shop',
-      startDateTime: DateTime.parse("2025-09-28 23:15:00"),
-      endDateTime: DateTime.parse("2025-09-29 00:45:00"),
-      color: Colors.orange,
-    ),
-  ];
+  List<Event> _events = [];
+  final EventRepository _eventRepository = EventRepositoryImpl();
+  bool _isLoading = true;
 
   String get _dayOfWeek {
     const weekdays = [
@@ -75,19 +53,55 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final eventsForSelectedDate = _events.where((event) {
-      return event.startDateTime.year == _selectedDate.year &&
-          event.startDateTime.month == _selectedDate.month &&
-          event.startDateTime.day == _selectedDate.day;
+  void initState() {
+    super.initState();
+    _loadEvents();
+  }
+
+  Future<void> _loadEvents() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      await _eventRepository.insertSampleData();
+      final events = await _eventRepository.getEvents();
+      setState(() {
+        _events = events;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading events: $e')),
+        );
+      }
+    }
+  }
+
+  List<Event> _getEventsForDay(DateTime day) {
+    return _events.where((event) {
+      return event.startDateTime.year == day.year &&
+          event.startDateTime.month == day.month &&
+          event.startDateTime.day == day.day;
     }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final eventsForSelectedDate = _getEventsForDay(_selectedDate);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(top: 8),
-          child: Column(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
             children: [
               Text(
                 _dayOfWeek,
@@ -206,9 +220,10 @@ class _CalendarPageState extends State<CalendarPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => AddEventPage(
-                                            onEventAdded: (event) {
-                                              setState(() => _events.add(event));
+                                          builder: (context) => EventFormPage(
+                                            onEventSaved: (event) async {
+                                              await _eventRepository.addEvent(event);
+                                              _loadEvents();
                                             },
                                             selectedDate: _selectedDate,
                                           ),
@@ -320,12 +335,15 @@ class _CalendarPageState extends State<CalendarPage> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      EventDetailsPage(
+                                                  builder: (context) => EventDetailsPage(
                                                     event: event,
-                                                    onEventDeleted: () {
-                                                      setState(() =>
-                                                          _events.remove(event));
+                                                    onEventDeleted: () async {
+                                                      await _eventRepository.deleteEvent(event.id!);
+                                                      _loadEvents();
+                                                    },
+                                                    onEventUpdated: (updatedEvent) async {
+                                                      await _eventRepository.updateEvent(updatedEvent);
+                                                      _loadEvents();
                                                     },
                                                   ),
                                                 ),

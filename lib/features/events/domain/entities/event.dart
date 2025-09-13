@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 
@@ -9,7 +9,7 @@ class Event extends Equatable {
   final String? location;
   final DateTime startDateTime;
   final DateTime endDateTime;
-  final Color color;
+  final String colorName;
   final int reminderTime;
 
   const Event({
@@ -19,12 +19,25 @@ class Event extends Equatable {
     this.location = "",
     required this.startDateTime,
     required this.endDateTime,
-    required this.color,
+    required this.colorName,
     this.reminderTime = 15,
   });
 
   String get timeRange =>
       '${DateFormat('HH:mm').format(startDateTime)}-${DateFormat('HH:mm').format(endDateTime)}';
+
+  Color get color {
+    switch (colorName) {
+      case 'blue':
+        return Colors.blue;
+      case 'red':
+        return Colors.red;
+      case 'orange':
+        return Colors.orange;
+      default:
+        return Colors.blue;
+    }
+  }
 
   String get reminderTimeFormatted {
     if (reminderTime >= 1440) {
@@ -44,7 +57,7 @@ class Event extends Equatable {
         title,
         description,
         location,
-        color,
+        colorName,
         startDateTime,
         endDateTime,
         reminderTime

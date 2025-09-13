@@ -19,7 +19,7 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -32,7 +32,7 @@ class AppDatabase {
         title TEXT NOT NULL,
         description TEXT,
         location TEXT,
-        color INTEGER NOT NULL,
+        colorName TEXT NOT NULL,
         startDateTime INTEGER NOT NULL,
         endDateTime INTEGER NOT NULL,
         reminderTime INTEGER DEFAULT 15
@@ -41,8 +41,8 @@ class AppDatabase {
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      // Drop old table and recreate with new schema
+    if (oldVersion < 3) {
+      // Migrate from color INTEGER to colorName TEXT
       await db.execute('DROP TABLE IF EXISTS events');
       await _createDB(db, newVersion);
     }
