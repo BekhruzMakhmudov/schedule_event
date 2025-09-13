@@ -32,90 +32,108 @@ class EventList extends StatelessWidget {
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: event.color.withAlpha(60),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: event.color.withAlpha(120),
-              width: 1,
-            ),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            title: Text(
-              event.title,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: event.color,
-                  ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  event.description,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: event.color),
+        return Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 12,
+              decoration: BoxDecoration(
+                color: event.color,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time_filled,
-                      size: 16,
-                      color: event.color,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      event.timeRange,
-                      style: TextStyle(
-                        color: event.color,
-                        fontSize: 12,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: event.color.withAlpha(60),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+                border: Border.all(
+                  color: event.color.withAlpha(120),
+                  width: 1,
+                ),
+              ),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+                title: Text(
+                  event.title,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    if (event.location != null &&
-                        event.location!.isNotEmpty) ...[
-                      Icon(
-                        Icons.location_on,
-                        size: 16,
                         color: event.color,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        event.location!,
-                        style: TextStyle(
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      event.description,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: event.color),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time_filled,
+                          size: 16,
                           color: event.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Text(
+                          event.timeRange,
+                          style: TextStyle(
+                            color: event.color,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        if (event.location != null &&
+                            event.location!.isNotEmpty) ...[
+                          Icon(
+                            Icons.location_on,
+                            size: 16,
+                            color: event.color,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            event.location!,
+                            style: TextStyle(
+                              color: event.color,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
-              ],
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EventDetailsPage(
+                        event: event,
+                        onEventDeleted: onEventDeleted,
+                        onEventUpdated: onEventUpdated,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EventDetailsPage(
-                    event: event,
-                    onEventDeleted: onEventDeleted,
-                    onEventUpdated: onEventUpdated,
-                  ),
-                ),
-              );
-            },
-          ),
+          ],
         );
       },
     );
