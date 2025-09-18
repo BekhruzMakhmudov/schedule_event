@@ -3,9 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../../../core/services/location_permission_service.dart';
-import '../widgets/map/search_input.dart';
-import '../widgets/map/zoom_controls.dart';
-import '../widgets/map/selected_location_card.dart';
+import '../widgets/map_widgets/map_widgets.dart';
 
 class LocationPickerPage extends StatefulWidget {
   final String? initialLocation;
