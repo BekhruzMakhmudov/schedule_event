@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
 import '../../../../core/services/notification_service.dart';
 import 'location_picker_page.dart';
+import '../widgets/custom_dropdown.dart';
 
 class EventFormPage extends StatefulWidget {
   final Event? event; // null for add, existing event for edit
@@ -13,8 +14,8 @@ class EventFormPage extends StatefulWidget {
     this.event,
     required this.onEventSaved,
     this.selectedDate,
-  }) : assert(event != null || selectedDate != null, 
-         'Either event (for edit) or selectedDate (for add) must be provided');
+  }) : assert(event != null || selectedDate != null,
+            'Either event (for edit) or selectedDate (for add) must be provided');
 
   @override
   State<EventFormPage> createState() => _EventFormPageState();
@@ -48,31 +49,28 @@ class _EventFormPageState extends State<EventFormPage> {
   @override
   void initState() {
     super.initState();
-    
+
     if (isEditing) {
-      // Initialize with existing event data
       final event = widget.event!;
       _nameController = TextEditingController(text: event.title);
       _descriptionController = TextEditingController(text: event.description);
       _locationController = TextEditingController(text: event.location ?? '');
-      
+
       _selectedColor = event.color;
       _startTime = TimeOfDay.fromDateTime(event.startDateTime);
       _endTime = TimeOfDay.fromDateTime(event.endDateTime);
       _reminderTime = event.reminderTime;
     } else {
-      // Initialize with default values for new event
       _nameController = TextEditingController();
       _descriptionController = TextEditingController();
       _locationController = TextEditingController();
-      
+
       _selectedColor = Colors.blue;
       _startTime = TimeOfDay.now();
       _endTime = TimeOfDay.now();
       _reminderTime = 15;
     }
   }
-
 
   String _colorToString(Color color) {
     if (color == Colors.blue) return 'blue';
@@ -93,15 +91,16 @@ class _EventFormPageState extends State<EventFormPage> {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
-  DateTime get eventDate => isEditing ? widget.event!.startDateTime : widget.selectedDate!;
+  DateTime get eventDate =>
+      isEditing ? widget.event!.startDateTime : widget.selectedDate!;
 
   Future<void> _openLocationPicker() async {
     final String? selectedLocation = await Navigator.push<String>(
       context,
       MaterialPageRoute(
         builder: (context) => LocationPickerPage(
-          initialLocation: _locationController.text.isNotEmpty 
-              ? _locationController.text 
+          initialLocation: _locationController.text.isNotEmpty
+              ? _locationController.text
               : null,
         ),
       ),
@@ -202,23 +201,14 @@ class _EventFormPageState extends State<EventFormPage> {
               const Text('Priority color',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              DropdownButton<Color>(
+              CustomDropdown<Color>(
                 value: _selectedColor,
-                onChanged: (Color? newValue) {
-                  setState(() {
-                    _selectedColor = newValue!;
-                  });
-                },
-                alignment: Alignment.center,
-                underline: Container(),
-                dropdownColor: Colors.white,
-                items:
-                    _colorOptions.map<DropdownMenuItem<Color>>((Color color) {
-                  return DropdownMenuItem<Color>(
-                    value: color,
-                    child: Container(width: 20, height: 20, color: color),
-                  );
-                }).toList(),
+                items: _colorOptions,
+                onChanged: (color) => setState(() => _selectedColor = color),
+                itemBuilder: (color) =>
+                    Container(width: 20, height: 20, color: color),
+                isExpanded: false,
+                wrapWithContainer: false,
               ),
               const SizedBox(height: 16),
               const Text('Event time',
@@ -284,38 +274,20 @@ class _EventFormPageState extends State<EventFormPage> {
               const Text('Reminder',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(8),
+              CustomDropdown<int>(
+                value: _reminderTime,
+                items: _reminderOptions.keys.toList(),
+                onChanged: (value) => setState(() => _reminderTime = value),
+                itemBuilder: (key) => Row(
+                  children: [
+                    const Icon(Icons.notifications,
+                        color: Colors.blue, size: 20),
+                    const SizedBox(width: 8),
+                    Text(_reminderOptions[key]!),
+                  ],
                 ),
-                child: DropdownButton<int>(
-                  value: _reminderTime,
-                  onChanged: (int? newValue) {
-                    setState(() {
-                      _reminderTime = newValue!;
-                    });
-                  },
-                  isExpanded: true,
-                  dropdownColor: Colors.white,
-                  underline: Container(),
-                  items: _reminderOptions.entries
-                      .map<DropdownMenuItem<int>>((entry) {
-                    return DropdownMenuItem<int>(
-                      value: entry.key,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.notifications,
-                              color: Colors.blue, size: 20),
-                          const SizedBox(width: 8),
-                          Text(entry.value),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
+                isExpanded: true,
+                wrapWithContainer: true,
               ),
               const SizedBox(height: 40),
               SizedBox(
@@ -336,8 +308,8 @@ class _EventFormPageState extends State<EventFormPage> {
                         return;
                       }
 
-                      final eventId = isEditing 
-                          ? widget.event!.id 
+                      final eventId = isEditing
+                          ? widget.event!.id
                           : DateTime.now().millisecondsSinceEpoch;
 
                       final event = Event(
@@ -351,12 +323,11 @@ class _EventFormPageState extends State<EventFormPage> {
                         reminderTime: _reminderTime,
                       );
 
-                      // Handle notifications
                       if (isEditing) {
-                        // Cancel old notification and schedule new one
-                        await NotificationService().cancelNotification(widget.event!.id!);
+                        await NotificationService()
+                            .cancelNotification(widget.event!.id!);
                       }
-                      
+
                       await NotificationService().scheduleEventReminder(
                         eventId: event.id!,
                         eventTitle: event.title,

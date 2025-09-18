@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import '../../../../core/services/location_permission_service.dart';
+import '../widgets/map/search_input.dart';
+import '../widgets/map/zoom_controls.dart';
+import '../widgets/map/selected_location_card.dart';
 
 class LocationPickerPage extends StatefulWidget {
   final String? initialLocation;
@@ -67,16 +71,56 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
 
   Future<void> _getCurrentLocation() async {
     try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          throw Exception('Location permissions are denied');
+      // Use centralized permission service
+      final permissionService = const LocationPermissionService();
+
+      // First ensure that location services are enabled (GPS)
+      final serviceEnabled = await permissionService.isServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Location services are disabled'),
+              action: SnackBarAction(
+                label: 'Open Settings',
+                onPressed: () {
+                  permissionService.openLocationSettings();
+                },
+              ),
+            ),
+          );
         }
+        setState(() {
+          _isLoading = false;
+        });
+        return;
       }
 
-      if (permission == LocationPermission.deniedForever) {
-        throw Exception('Location permissions are permanently denied');
+      // Then ensure we have permission
+      final hasPermission = await permissionService.ensureLocationPermission();
+      if (!hasPermission) {
+        final permanentlyDenied = await permissionService.isPermanentlyDenied();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(permanentlyDenied
+                  ? 'Location permission is permanently denied'
+                  : 'Location permission is required'),
+              action: permanentlyDenied
+                  ? SnackBarAction(
+                      label: 'Open Settings',
+                      onPressed: () {
+                        permissionService.openAppSettings();
+                      },
+                    )
+                  : null,
+            ),
+          );
+        }
+        setState(() {
+          _isLoading = false;
+        });
+        return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
@@ -278,173 +322,30 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                   top: 20,
                   left: 20,
                   right: 20,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search for a location...',
-                        hintStyle: TextStyle(color: Colors.grey[400]),
-                        prefixIcon: _isSearching
-                            ? const Padding(
-                                padding: EdgeInsets.all(12.0),
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                              )
-                            : const Icon(Icons.search, color: Colors.grey),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon:
-                                    const Icon(Icons.clear, color: Colors.grey),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() {});
-                                },
-                              )
-                            : null,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                      ),
-                      onSubmitted: _searchLocation,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                    ),
+                  child: SearchInput(
+                    controller: _searchController,
+                    isLoading: _isSearching,
+                    onSubmitted: _searchLocation,
+                    onChanged: (_) => setState(() {}),
+                    onCleared: () => setState(() {}),
                   ),
                 ),
-                // Custom zoom controls
                 Positioned(
                   right: 20,
                   top: 100,
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          onPressed: _zoomIn,
-                          icon: const Icon(Icons.add, color: Colors.black54),
-                          iconSize: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          onPressed: _zoomOut,
-                          icon: const Icon(Icons.remove, color: Colors.black54),
-                          iconSize: 24,
-                        ),
-                      ),
-                    ],
+                  child: ZoomControls(
+                    onZoomIn: () => _zoomIn(),
+                    onZoomOut: () => _zoomOut(),
                   ),
                 ),
                 Positioned(
                   bottom: 20,
                   left: 20,
                   right: 20,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Selected Location:',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _selectedAddress.isNotEmpty
-                              ? _selectedAddress
-                              : 'Tap on the map to select a location',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _selectedAddress.isNotEmpty
-                                ? _confirmLocation
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'Confirm Location',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: SelectedLocationCard(
+                    address: _selectedAddress,
+                    onConfirm: _confirmLocation,
+                    enabled: true,
                   ),
                 ),
               ],

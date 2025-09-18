@@ -9,12 +9,14 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
     tz.initializeTimeZones();
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -36,11 +38,14 @@ class NotificationService {
 
   Future<void> _requestPermissions() async {
     if (Platform.isAndroid) {
-      final androidPlugin = _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin =
+          _notifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
       await androidPlugin?.requestNotificationsPermission();
       await androidPlugin?.requestExactAlarmsPermission();
     } else if (Platform.isIOS) {
-      final iosPlugin = _notifications.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+      final iosPlugin = _notifications.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
       await iosPlugin?.requestPermissions(
         alert: true,
         badge: true,
@@ -60,9 +65,9 @@ class NotificationService {
     required DateTime eventStartTime,
     required int reminderMinutes,
   }) async {
-    final scheduledDate = eventStartTime.subtract(Duration(minutes: reminderMinutes));
-    
-    // Don't schedule if the reminder time is in the past
+    final scheduledDate =
+        eventStartTime.subtract(Duration(minutes: reminderMinutes));
+
     if (scheduledDate.isBefore(DateTime.now())) {
       return;
     }
@@ -96,7 +101,8 @@ class NotificationService {
       scheduledTz,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
