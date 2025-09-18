@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
 import '../../../../core/services/notification_service.dart';
 import 'location_picker_page.dart';
-import '../widgets/custom_dropdown.dart';
 import '../../../../core/constants/constants.dart';
 import '../../../../core/utils/color_mapper.dart';
+import '../widgets/form_widgets/form_widgets.dart';
 
 class EventFormPage extends StatefulWidget {
   final Event? event; // null for add, existing event for edit
@@ -123,66 +123,26 @@ class _EventFormPageState extends State<EventFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Event name',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              TextField(
+              const SizedBox(height: 0),
+              CustomInput(
+                title: 'Event name',
                 controller: _nameController,
-                decoration: InputDecoration(
-                  hintText: 'Enter event name',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.blue),
-                  ),
-                ),
+                hintText: 'Enter event name',
               ),
               const SizedBox(height: 16),
-              const Text('Event description',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              TextField(
+              CustomInput(
+                title: 'Event description',
                 controller: _descriptionController,
+                hintText: 'Enter event description',
                 maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Enter event description',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.blue),
-                  ),
-                ),
               ),
               const SizedBox(height: 16),
-              const Text('Event location',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              TextField(
+              CustomInput(
+                title: 'Event location',
                 controller: _locationController,
-                decoration: InputDecoration(
-                  hintText: 'Enter location',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  suffixIcon: GestureDetector(
-                    onTap: _openLocationPicker,
-                    child: const Icon(Icons.location_on, color: Colors.blue),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.blue),
-                  ),
-                ),
+                hintText: 'Enter location',
+                suffixIcon: Icons.location_on,
+                onSuffixTap: _openLocationPicker,
               ),
               const SizedBox(height: 16),
               const Text('Priority color',
@@ -201,61 +161,11 @@ class _EventFormPageState extends State<EventFormPage> {
               const Text('Event time',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        final time = await showTimePicker(
-                          context: context,
-                          initialTime: _startTime,
-                        );
-                        if (time != null) {
-                          setState(() => _startTime = time);
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          _startTime.format(context),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('-', style: TextStyle(fontSize: 18)),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        final time = await showTimePicker(
-                          context: context,
-                          initialTime: _endTime,
-                        );
-                        if (time != null) {
-                          setState(() => _endTime = time);
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          _endTime.format(context),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              TimeRangePicker(
+                startTime: _startTime,
+                endTime: _endTime,
+                onStartChanged: (t) => setState(() => _startTime = t),
+                onEndChanged: (t) => setState(() => _endTime = t),
               ),
               const SizedBox(height: 16),
               const Text('Reminder',
