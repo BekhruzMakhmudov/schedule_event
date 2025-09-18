@@ -71,10 +71,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
 
   Future<void> _getCurrentLocation() async {
     try {
-      // Use centralized permission service
       final permissionService = const LocationPermissionService();
-
-      // First ensure that location services are enabled (GPS)
       final serviceEnabled = await permissionService.isServiceEnabled();
       if (!serviceEnabled) {
         if (mounted) {
@@ -96,7 +93,6 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
         return;
       }
 
-      // Then ensure we have permission
       final hasPermission = await permissionService.ensureLocationPermission();
       if (!hasPermission) {
         final permanentlyDenied = await permissionService.isPermanentlyDenied();

@@ -3,6 +3,8 @@ import '../../domain/entities/event.dart';
 import '../../../../core/services/notification_service.dart';
 import 'location_picker_page.dart';
 import '../widgets/custom_dropdown.dart';
+import '../../../../core/constants/constants.dart';
+import '../../../../core/utils/color_mapper.dart';
 
 class EventFormPage extends StatefulWidget {
   final Event? event; // null for add, existing event for edit
@@ -31,16 +33,8 @@ class _EventFormPageState extends State<EventFormPage> {
   late TimeOfDay _endTime;
   late int _reminderTime;
 
-  final _colorOptions = [Colors.blue, Colors.orange, Colors.red];
-  final _reminderOptions = {
-    5: '5 minutes before',
-    10: '10 minutes before',
-    15: '15 minutes before',
-    30: '30 minutes before',
-    60: '1 hour before',
-    120: '2 hours before',
-    1440: '1 day before',
-  };
+  final _colorOptions = kEventColorOptions;
+  final _reminderOptions = kReminderOptions;
 
   bool get isEditing => widget.event != null;
   String get pageTitle => isEditing ? 'Edit Event' : 'Add Event';
@@ -70,13 +64,6 @@ class _EventFormPageState extends State<EventFormPage> {
       _endTime = TimeOfDay.now();
       _reminderTime = 15;
     }
-  }
-
-  String _colorToString(Color color) {
-    if (color == Colors.blue) return 'blue';
-    if (color == Colors.red) return 'red';
-    if (color == Colors.orange) return 'orange';
-    return 'blue'; // default
   }
 
   @override
@@ -319,7 +306,7 @@ class _EventFormPageState extends State<EventFormPage> {
                         location: _locationController.text,
                         startDateTime: start,
                         endDateTime: end,
-                        colorName: _colorToString(_selectedColor),
+                        colorName: ColorMapper.colorToString(_selectedColor),
                         reminderTime: _reminderTime,
                       );
 
