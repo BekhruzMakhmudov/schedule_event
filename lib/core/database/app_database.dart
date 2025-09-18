@@ -19,7 +19,7 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -38,13 +38,37 @@ class AppDatabase {
         reminderTime INTEGER DEFAULT 15
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE notifications(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        eventId INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        body TEXT,
+        scheduledAt INTEGER NOT NULL,
+        deliveredAt INTEGER NOT NULL,
+        isRead INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 3) {
-      // Migrate from color INTEGER to colorName TEXT
       await db.execute('DROP TABLE IF EXISTS events');
       await _createDB(db, newVersion);
+    }
+    if (oldVersion < 4) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS notifications(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          eventId INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          body TEXT,
+          scheduledAt INTEGER NOT NULL,
+          deliveredAt INTEGER NOT NULL,
+          isRead INTEGER NOT NULL DEFAULT 0
+        )
+      ''');
     }
   }
 }

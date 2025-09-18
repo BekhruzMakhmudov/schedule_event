@@ -7,6 +7,8 @@ import 'event_form_page.dart';
 import '../../domain/repositories/event_repository.dart';
 import '../../data/repositories/event_repository_impl.dart';
 import '../widgets/event_list.dart';
+import '../../../../core/services/notification_service.dart';
+import 'notification_page.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -15,11 +17,14 @@ class CalendarPage extends StatefulWidget {
   State<CalendarPage> createState() => _CalendarPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
+class _CalendarPageState extends State<CalendarPage>
+    with WidgetsBindingObserver {
   DateTime _selectedDate = DateTime.now();
   List<Event> _events = [];
   final EventRepository _eventRepository = EventRepositoryImpl();
   bool _isLoading = true;
+  int _unreadCount = 0;
+  final NotificationService _notificationService = NotificationService();
 
   String get _dayOfWeek {
     const weekdays = [
@@ -32,6 +37,14 @@ class _CalendarPageState extends State<CalendarPage> {
       'Sunday'
     ];
     return weekdays[_selectedDate.weekday - 1];
+  }
+
+  Future<void> _loadUnreadCount() async {
+    final count = await _notificationService.getUnreadCount();
+    if (!mounted) return;
+    setState(() {
+      _unreadCount = count;
+    });
   }
 
   String get _formattedDate {
@@ -55,7 +68,22 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadEvents();
+    _loadUnreadCount();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadUnreadCount();
+    }
   }
 
   Future<void> _loadEvents() async {
@@ -158,20 +186,27 @@ class _CalendarPageState extends State<CalendarPage> {
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications),
-                onPressed: () {},
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const NotificationPage()),
+                  );
+                  await _loadUnreadCount();
+                },
               ),
-              Positioned(
-                right: 15,
-                top: 15,
-                child: Container(
-                  width: 7,
-                  height: 7,
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
+              if (_unreadCount > 0)
+                Positioned(
+                  right: 15,
+                  top: 15,
+                  child: Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ],

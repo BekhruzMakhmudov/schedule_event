@@ -50,7 +50,7 @@ class _EventFormPageState extends State<EventFormPage> {
       _descriptionController = TextEditingController(text: event.description);
       _locationController = TextEditingController(text: event.location ?? '');
 
-      _selectedColor = event.color;
+      _selectedColor = ColorMapper.stringToColor(event.colorName);
       _startTime = TimeOfDay.fromDateTime(event.startDateTime);
       _endTime = TimeOfDay.fromDateTime(event.endDateTime);
       _reminderTime = event.reminderTime;

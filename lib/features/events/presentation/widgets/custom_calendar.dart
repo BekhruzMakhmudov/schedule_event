@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_event/core/utils/color_mapper.dart';
 import '../../domain/entities/event.dart';
 
 class CustomCalendar extends StatefulWidget {
@@ -189,7 +190,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
                                 margin:
                                     const EdgeInsets.symmetric(horizontal: 1),
                                 decoration: BoxDecoration(
-                                  color: e.color,
+                                  color: ColorMapper.stringToColor(e.colorName),
                                   shape: BoxShape.circle,
                                 ),
                               ),

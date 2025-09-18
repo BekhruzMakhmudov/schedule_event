@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 
@@ -25,31 +24,6 @@ class Event extends Equatable {
 
   String get timeRange =>
       '${DateFormat('HH:mm').format(startDateTime)}-${DateFormat('HH:mm').format(endDateTime)}';
-
-  Color get color {
-    switch (colorName) {
-      case 'blue':
-        return Colors.blue;
-      case 'red':
-        return Colors.red;
-      case 'orange':
-        return Colors.orange;
-      default:
-        return Colors.blue;
-    }
-  }
-
-  String get reminderTimeFormatted {
-    if (reminderTime >= 1440) {
-      final days = reminderTime ~/ 1440;
-      return '$days day${days == 1 ? '' : 's'} before';
-    } else if (reminderTime >= 60) {
-      final hours = reminderTime ~/ 60;
-      return '$hours hour${hours == 1 ? '' : 's'} before';
-    } else {
-      return '$reminderTime minute${reminderTime == 1 ? '' : 's'} before';
-    }
-  }
 
   @override
   List<Object?> get props => [

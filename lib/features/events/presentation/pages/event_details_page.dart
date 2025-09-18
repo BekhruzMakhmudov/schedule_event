@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:schedule_event/core/utils/color_mapper.dart';
+import 'package:schedule_event/core/utils/reminder_formatter.dart';
 import '../../domain/entities/event.dart';
 import 'event_form_page.dart';
 
@@ -32,7 +33,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: currentEvent.color,
+        backgroundColor: ColorMapper.stringToColor(currentEvent.colorName),
         leading: InkWell(
           child: Container(
             margin: const EdgeInsets.only(left: 24),
@@ -86,7 +87,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: currentEvent.color,
+              color: ColorMapper.stringToColor(currentEvent.colorName),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),
@@ -169,7 +170,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    currentEvent.reminderTimeFormatted,
+                    formatReminderTime(currentEvent.reminderTime),
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -185,7 +186,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    currentEvent.description.isNotEmpty ? currentEvent.description : 'No description provided',
+                    currentEvent.description.isNotEmpty
+                        ? currentEvent.description
+                        : 'No description provided',
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
@@ -214,7 +217,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 TextButton(
                                   onPressed: () async {
                                     if (currentEvent.id != null) {
-                                      await widget.onEventDeleted(currentEvent.id!);
+                                      await widget
+                                          .onEventDeleted(currentEvent.id!);
                                     }
                                     Navigator.pop(context);
                                     Navigator.pop(context);

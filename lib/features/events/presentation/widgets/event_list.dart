@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_event/core/utils/color_mapper.dart';
 import '../../domain/entities/event.dart';
 import '../pages/event_details_page.dart';
 
@@ -52,7 +53,7 @@ class _EventListState extends State<EventList> {
               width: double.infinity,
               height: 12,
               decoration: BoxDecoration(
-                color: event.color,
+                color: ColorMapper.stringToColor(event.colorName),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
@@ -62,13 +63,14 @@ class _EventListState extends State<EventList> {
             Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: event.color.withAlpha(60),
+                color: ColorMapper.stringToColor(event.colorName).withAlpha(60),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(12),
                   bottomRight: Radius.circular(12),
                 ),
                 border: Border.all(
-                  color: event.color.withAlpha(120),
+                  color:
+                      ColorMapper.stringToColor(event.colorName).withAlpha(120),
                   width: 1,
                 ),
               ),
@@ -81,7 +83,7 @@ class _EventListState extends State<EventList> {
                   event.title,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: event.color,
+                        color: ColorMapper.stringToColor(event.colorName),
                       ),
                 ),
                 subtitle: Column(
@@ -89,10 +91,8 @@ class _EventListState extends State<EventList> {
                   children: [
                     Text(
                       event.description,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: event.color),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: ColorMapper.stringToColor(event.colorName)),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -100,13 +100,13 @@ class _EventListState extends State<EventList> {
                         Icon(
                           Icons.access_time_filled,
                           size: 16,
-                          color: event.color,
+                          color: ColorMapper.stringToColor(event.colorName),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           event.timeRange,
                           style: TextStyle(
-                            color: event.color,
+                            color: ColorMapper.stringToColor(event.colorName),
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
@@ -117,14 +117,15 @@ class _EventListState extends State<EventList> {
                           Icon(
                             Icons.location_on,
                             size: 16,
-                            color: event.color,
+                            color: ColorMapper.stringToColor(event.colorName),
                           ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               event.location!,
                               style: TextStyle(
-                                color: event.color,
+                                color:
+                                    ColorMapper.stringToColor(event.colorName),
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),

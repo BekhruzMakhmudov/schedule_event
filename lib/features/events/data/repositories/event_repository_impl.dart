@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
 import '../../domain/repositories/event_repository.dart';
 import '../models/event_model.dart';
@@ -7,21 +6,10 @@ import '../../../../core/database/app_database.dart';
 class EventRepositoryImpl implements EventRepository {
   final AppDatabase _database = AppDatabase.instance;
 
-  // Convert Color to string for database storage
-  String _colorToString(Color color) {
-    if (color == Colors.blue) return 'blue';
-    if (color == Colors.red) return 'red';
-    if (color == Colors.orange) return 'orange';
-    return 'blue'; // default
-  }
-
-
-  // Convert DateTime to milliseconds for database storage
   int _dateTimeToInt(DateTime dateTime) {
     return dateTime.millisecondsSinceEpoch;
   }
 
-  // Convert milliseconds to DateTime from database
   DateTime _intToDateTime(int milliseconds) {
     return DateTime.fromMillisecondsSinceEpoch(milliseconds);
   }
@@ -99,12 +87,12 @@ class EventRepositoryImpl implements EventRepository {
   @override
   Future<void> addEvent(Event event) async {
     final db = await _database.database;
-    
+
     final eventData = {
       'title': event.title,
       'description': event.description,
       'location': event.location ?? '',
-      'colorName': _colorToString(event.color),
+      'colorName': event.colorName,
       'startDateTime': _dateTimeToInt(event.startDateTime),
       'endDateTime': _dateTimeToInt(event.endDateTime),
       'reminderTime': event.reminderTime,
@@ -120,12 +108,12 @@ class EventRepositoryImpl implements EventRepository {
   @override
   Future<int> updateEvent(Event event) async {
     final db = await _database.database;
-    
+
     final eventData = {
       'title': event.title,
       'description': event.description,
       'location': event.location ?? '',
-      'colorName': _colorToString(event.color),
+      'colorName': event.colorName,
       'startDateTime': _dateTimeToInt(event.startDateTime),
       'endDateTime': _dateTimeToInt(event.endDateTime),
       'reminderTime': event.reminderTime,
