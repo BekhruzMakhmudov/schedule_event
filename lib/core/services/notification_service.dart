@@ -5,6 +5,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import '../database/app_database.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -18,6 +19,16 @@ class NotificationService {
     const int int32Range = (1 << 31); // 2^31
     final normalized = id % int32Range;
     return normalized < 0 ? normalized + int32Range : normalized;
+  }
+
+  Future<void> _deleteReadNotifications() async {
+    final db = await AppDatabase.instance.database;
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    await db.delete(
+      'notifications',
+      where: 'isRead = 1 AND deliveredAt <= ?',
+      whereArgs: [nowMs],
+    );
   }
 
   Future<void> initialize() async {
@@ -42,6 +53,7 @@ class NotificationService {
     );
 
     await _requestPermissions();
+    await updateAppBadge();
   }
 
   Future<void> _requestPermissions() async {
@@ -101,9 +113,11 @@ class NotificationService {
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
+      //number: 1,
     );
 
     const iosDetails = DarwinNotificationDetails(
+      badgeNumber: 1,
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
@@ -137,6 +151,7 @@ class NotificationService {
       scheduledAt: DateTime.now().millisecondsSinceEpoch,
       deliveredAt: scheduledDate.millisecondsSinceEpoch,
     );
+    await updateAppBadge();
   }
 
   Future<void> cancelNotification(int eventId) async {
@@ -151,7 +166,6 @@ class NotificationService {
     return await _notifications.pendingNotificationRequests();
   }
 
-  // ====== Persistence helpers for notifications table ======
   Future<void> _insertNotification({
     required int eventId,
     required String title,
@@ -176,7 +190,6 @@ class NotificationService {
     final db = await AppDatabase.instance.database;
     final nowMs = DateTime.now().millisecondsSinceEpoch;
     final whereUnread = onlyUnread ? 'AND n.isRead = 0' : '';
-    // Join with events to fetch colorName for UI styling
     final rows = await db.rawQuery('''
       SELECT n.*, e.colorName
       FROM notifications n
@@ -200,16 +213,42 @@ class NotificationService {
 
   Future<void> markAsRead(int id) async {
     final db = await AppDatabase.instance.database;
-    await db.update('notifications', {'isRead': 1}, where: 'id = ?', whereArgs: [id]);
+    await db.update('notifications', {'isRead': 1},
+        where: 'id = ?', whereArgs: [id]);
+    await _deleteReadNotifications();
+    await updateAppBadge();
   }
 
   Future<void> markAllAsRead() async {
     final db = await AppDatabase.instance.database;
     await db.update('notifications', {'isRead': 1});
+    await _deleteReadNotifications();
+    await updateAppBadge();
   }
 
   Future<void> markAsReadByEventId(int eventId) async {
     final db = await AppDatabase.instance.database;
-    await db.update('notifications', {'isRead': 1}, where: 'eventId = ?', whereArgs: [eventId]);
+    await db.update('notifications', {'isRead': 1},
+        where: 'eventId = ?', whereArgs: [eventId]);
+    await _deleteReadNotifications();
+    await updateAppBadge();
+  }
+
+  Future<void> updateAppBadge() async {
+    try {
+      final count = await getUnreadCount();
+      final supported = await FlutterAppBadger.isAppBadgeSupported();
+      if (supported) {
+        if (count > 0) {
+          await FlutterAppBadger.updateBadgeCount(count);
+        } else {
+          await FlutterAppBadger.removeBadge();
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Failed to update app badge: $e');
+      }
+    }
   }
 }

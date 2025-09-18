@@ -71,6 +71,7 @@ class _CalendarPageState extends State<CalendarPage>
     WidgetsBinding.instance.addObserver(this);
     _loadEvents();
     _loadUnreadCount();
+    _notificationService.updateAppBadge();
   }
 
   @override
@@ -83,7 +84,14 @@ class _CalendarPageState extends State<CalendarPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _loadUnreadCount();
+      _notificationService.updateAppBadge();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      _notificationService.updateAppBadge();
     }
+    print('AppLifecycleState: $state');
   }
 
   Future<void> _loadEvents() async {
