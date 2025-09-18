@@ -4,7 +4,7 @@ import '../pages/event_details_page.dart';
 
 class EventList extends StatefulWidget {
   final List<Event> events;
-  final VoidCallback onEventDeleted;
+  final Future<void> Function(int id) onEventDeleted;
   final Function(Event) onEventUpdated;
 
   const EventList({

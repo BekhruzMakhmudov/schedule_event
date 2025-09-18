@@ -239,14 +239,14 @@ class _CalendarPageState extends State<CalendarPage> {
                       ],
                     ),
                   ),
-                  // Scrollable event list section
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: EventList(
                         events: eventsForSelectedDate,
-                        onEventDeleted: () async {
-                          _loadEvents();
+                        onEventDeleted: (int id) async {
+                          await _eventRepository.deleteEvent(id);
+                          await _loadEvents();
                         },
                         onEventUpdated: (updatedEvent) async {
                           await _eventRepository.updateEvent(updatedEvent);

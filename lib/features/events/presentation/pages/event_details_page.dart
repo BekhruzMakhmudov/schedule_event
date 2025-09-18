@@ -5,7 +5,7 @@ import 'event_form_page.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
-  final VoidCallback onEventDeleted;
+  final Future<void> Function(int id) onEventDeleted;
   final Function(Event)? onEventUpdated;
 
   const EventDetailsPage({
@@ -212,8 +212,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
-                                  onPressed: () {
-                                    widget.onEventDeleted();
+                                  onPressed: () async {
+                                    if (currentEvent.id != null) {
+                                      await widget.onEventDeleted(currentEvent.id!);
+                                    }
                                     Navigator.pop(context);
                                     Navigator.pop(context);
                                   },
