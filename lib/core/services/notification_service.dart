@@ -12,6 +12,12 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
 
+  int _normalizeId(int id) {
+    const int int32Range = (1 << 31); // 2^31
+    final normalized = id % int32Range;
+    return normalized < 0 ? normalized + int32Range : normalized;
+  }
+
   Future<void> initialize() async {
     tz.initializeTimeZones();
 
@@ -95,7 +101,7 @@ class NotificationService {
     final scheduledTz = tz.TZDateTime.from(scheduledDate, tz.local);
 
     await _notifications.zonedSchedule(
-      eventId,
+      _normalizeId(eventId),
       'Upcoming Event: $eventTitle',
       'Event starts in $reminderMinutes minutes${eventDescription.isNotEmpty ? '\n$eventDescription' : ''}',
       scheduledTz,
@@ -107,7 +113,7 @@ class NotificationService {
   }
 
   Future<void> cancelNotification(int eventId) async {
-    await _notifications.cancel(eventId);
+    await _notifications.cancel(_normalizeId(eventId));
   }
 
   Future<void> cancelAllNotifications() async {

@@ -205,9 +205,11 @@ class _EventFormPageState extends State<EventFormPage> {
                         return;
                       }
 
-                      final eventId = isEditing
-                          ? widget.event!.id
-                          : DateTime.now().millisecondsSinceEpoch;
+                      // 1 << 31 equals 2^31 (range size for signed 32-bit integers) for notification id
+                      final int eventId = isEditing
+                          ? widget.event!.id!
+                          : (DateTime.now().millisecondsSinceEpoch % (1 << 31))
+                              .toInt();
 
                       final event = Event(
                         id: eventId,
