@@ -97,6 +97,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: Padding(
           padding: const EdgeInsets.only(top: 8),
           child: _isLoading
@@ -178,94 +179,83 @@ class _CalendarPageState extends State<CalendarPage> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      CustomCalendar(
-                        events: _events,
-                        onDateSelected: (date) {
-                          setState(() => _selectedDate = date);
+            return Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // Fixed calendar section
+                  CustomCalendar(
+                    events: _events,
+                    onDateSelected: (date) {
+                      setState(() => _selectedDate = date);
+                    },
+                  ),
+                  // Fixed header section
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Schedule',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            FocusScope.of(context).unfocus();
+                            await Future.delayed(
+                                const Duration(milliseconds: 100));
+
+                            if (mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EventFormPage(
+                                    onEventSaved: (event) async {
+                                      await _eventRepository.addEvent(event);
+                                      _loadEvents();
+                                    },
+                                    selectedDate: _selectedDate,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            '+ Add Event',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Scrollable event list section
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: EventList(
+                        events: eventsForSelectedDate,
+                        onEventDeleted: () async {
+                          _loadEvents();
+                        },
+                        onEventUpdated: (updatedEvent) async {
+                          await _eventRepository.updateEvent(updatedEvent);
+                          _loadEvents();
                         },
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight * 0.3,
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Schedule',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    FocusScope.of(context).unfocus();
-                                    await Future.delayed(
-                                        const Duration(milliseconds: 100));
-
-                                    if (mounted) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EventFormPage(
-                                            onEventSaved: (event) async {
-                                              await _eventRepository
-                                                  .addEvent(event);
-                                              _loadEvents();
-                                            },
-                                            selectedDate: _selectedDate,
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    '+ Add Event',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            SizedBox(
-                              height: constraints.maxHeight,
-                              child: EventList(
-                                events: eventsForSelectedDate,
-                                onEventDeleted: () async {
-                                  _loadEvents();
-                                },
-                                onEventUpdated: (updatedEvent) async {
-                                  await _eventRepository
-                                      .updateEvent(updatedEvent);
-                                  _loadEvents();
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             );
           },

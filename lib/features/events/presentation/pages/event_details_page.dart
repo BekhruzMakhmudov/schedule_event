@@ -138,11 +138,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        currentEvent.location!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                      Expanded(
+                        child: Text(
+                          currentEvent.location!,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
                         ),
                       ),
                     ],

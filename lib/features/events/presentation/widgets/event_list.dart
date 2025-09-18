@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
 import '../pages/event_details_page.dart';
 
-class EventList extends StatelessWidget {
+class EventList extends StatefulWidget {
   final List<Event> events;
   final VoidCallback onEventDeleted;
   final Function(Event) onEventUpdated;
@@ -15,8 +15,21 @@ class EventList extends StatelessWidget {
   });
 
   @override
+  State<EventList> createState() => _EventListState();
+}
+
+class _EventListState extends State<EventList> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (events.isEmpty) {
+    if (widget.events.isEmpty) {
       return const Center(
         child: Text(
           'No events for this day',
@@ -29,9 +42,10 @@ class EventList extends StatelessWidget {
     }
 
     return ListView.builder(
-      itemCount: events.length,
+      controller: _scrollController,
+      itemCount: widget.events.length,
       itemBuilder: (context, index) {
-        final event = events[index];
+        final event = widget.events[index];
         return Column(
           children: [
             Container(
@@ -106,12 +120,16 @@ class EventList extends StatelessWidget {
                             color: event.color,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            event.location!,
-                            style: TextStyle(
-                              color: event.color,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                          Expanded(
+                            child: Text(
+                              event.location!,
+                              style: TextStyle(
+                                color: event.color,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
                         ],
@@ -125,8 +143,8 @@ class EventList extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => EventDetailsPage(
                         event: event,
-                        onEventDeleted: onEventDeleted,
-                        onEventUpdated: onEventUpdated,
+                        onEventDeleted: widget.onEventDeleted,
+                        onEventUpdated: widget.onEventUpdated,
                       ),
                     ),
                   );

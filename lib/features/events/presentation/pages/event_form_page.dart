@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/event.dart';
 import '../../../../core/services/notification_service.dart';
+import 'location_picker_page.dart';
 
 class EventFormPage extends StatefulWidget {
   final Event? event; // null for add, existing event for edit
@@ -94,6 +95,25 @@ class _EventFormPageState extends State<EventFormPage> {
 
   DateTime get eventDate => isEditing ? widget.event!.startDateTime : widget.selectedDate!;
 
+  Future<void> _openLocationPicker() async {
+    final String? selectedLocation = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LocationPickerPage(
+          initialLocation: _locationController.text.isNotEmpty 
+              ? _locationController.text 
+              : null,
+        ),
+      ),
+    );
+
+    if (selectedLocation != null) {
+      setState(() {
+        _locationController.text = selectedLocation;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,7 +184,10 @@ class _EventFormPageState extends State<EventFormPage> {
                 decoration: InputDecoration(
                   hintText: 'Enter location',
                   hintStyle: TextStyle(color: Colors.grey[400]),
-                  suffixIcon: const Icon(Icons.location_on, color: Colors.blue),
+                  suffixIcon: GestureDetector(
+                    onTap: _openLocationPicker,
+                    child: const Icon(Icons.location_on, color: Colors.blue),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(color: Colors.grey[300]!),
