@@ -91,7 +91,6 @@ class _CalendarPageState extends State<CalendarPage>
         state == AppLifecycleState.detached) {
       _notificationService.updateAppBadge();
     }
-    print('AppLifecycleState: $state');
   }
 
   Future<void> _loadEvents() async {

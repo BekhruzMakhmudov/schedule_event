@@ -124,15 +124,13 @@ class _NotificationPageState extends State<NotificationPage> {
                                 ),
                               ],
                             ),
-                            trailing: isRead
-                                ? null
-                                : TextButton(
-                                    onPressed: () => _markAsRead(id),
-                                    child: Text(
-                                      'Mark read',
-                                      style: TextStyle(color: baseColor),
-                                    ),
-                                  ),
+                            trailing: TextButton(
+                              onPressed: () => _markAsRead(id),
+                              child: Text(
+                                'Mark read',
+                                style: TextStyle(color: baseColor),
+                              ),
+                            ),
                             onTap: () => _markAsRead(id),
                           ),
                         ),

@@ -215,6 +215,21 @@ class NotificationService {
     final db = await AppDatabase.instance.database;
     await db.update('notifications', {'isRead': 1},
         where: 'id = ?', whereArgs: [id]);
+    try {
+      final rows = await db.query(
+        'notifications',
+        columns: ['eventId'],
+        where: 'id = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      if (rows.isNotEmpty) {
+        final eventId = (rows.first['eventId'] as int?);
+        if (eventId != null) {
+          await cancelNotification(eventId);
+        }
+      }
+    } catch (_) {}
     await _deleteReadNotifications();
     await updateAppBadge();
   }
@@ -222,6 +237,7 @@ class NotificationService {
   Future<void> markAllAsRead() async {
     final db = await AppDatabase.instance.database;
     await db.update('notifications', {'isRead': 1});
+    await cancelAllNotifications();
     await _deleteReadNotifications();
     await updateAppBadge();
   }
@@ -230,6 +246,7 @@ class NotificationService {
     final db = await AppDatabase.instance.database;
     await db.update('notifications', {'isRead': 1},
         where: 'eventId = ?', whereArgs: [eventId]);
+    await cancelNotification(eventId);
     await _deleteReadNotifications();
     await updateAppBadge();
   }
