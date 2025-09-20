@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_event/core/utils/color_mapper.dart';
-import '../../domain/entities/event.dart';
+import '../../../domain/entities/event.dart';
 
 class CustomCalendar extends StatefulWidget {
   final Function(DateTime)? onDateSelected;

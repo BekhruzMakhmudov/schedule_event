@@ -5,16 +5,17 @@ import 'location_picker_page.dart';
 import '../../../../core/constants/constants.dart';
 import '../../../../core/utils/color_mapper.dart';
 import '../widgets/form_widgets/form_widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../presentation/bloc/event.dart';
+import '../../presentation/bloc/bloc.dart';
 
 class EventFormPage extends StatefulWidget {
   final Event? event; // null for add, existing event for edit
-  final Function(Event) onEventSaved;
   final DateTime? selectedDate; // required for add, optional for edit
 
   const EventFormPage({
     super.key,
     this.event,
-    required this.onEventSaved,
     this.selectedDate,
   }) : assert(event != null || selectedDate != null,
             'Either event (for edit) or selectedDate (for add) must be provided');
@@ -225,6 +226,11 @@ class _EventFormPageState extends State<EventFormPage> {
                       if (isEditing) {
                         await NotificationService()
                             .cancelNotification(widget.event!.id!);
+                        context
+                            .read<EventBloc>()
+                            .add(UpdateExistingEvent(event));
+                      } else {
+                        context.read<EventBloc>().add(AddNewEvent(event));
                       }
 
                       await NotificationService().scheduleEventReminder(
@@ -234,8 +240,6 @@ class _EventFormPageState extends State<EventFormPage> {
                         eventStartTime: event.startDateTime,
                         reminderMinutes: event.reminderTime,
                       );
-
-                      widget.onEventSaved(event);
                       Navigator.pop(context);
                     }
                   },

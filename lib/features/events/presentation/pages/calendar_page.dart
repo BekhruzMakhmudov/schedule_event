@@ -1,14 +1,16 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/event.dart';
-import '../widgets/custom_calendar.dart';
+import '../widgets/calendar_widgets/calendar_widgets.dart';
 import 'event_form_page.dart';
-import '../../domain/repositories/event_repository.dart';
-import '../../data/repositories/event_repository_impl.dart';
-import '../widgets/event_list.dart';
 import '../../../../core/services/notification_service.dart';
 import 'notification_page.dart';
+import '../../presentation/bloc/bloc.dart';
+import '../../presentation/bloc/state.dart';
+import '../../presentation/bloc/event.dart';
+import 'package:schedule_event/service_locator.dart';
+import '../../domain/repositories/event_repository.dart';
+import '../../../../core/utils/date_formatters.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -20,56 +22,21 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage>
     with WidgetsBindingObserver {
   DateTime _selectedDate = DateTime.now();
-  List<Event> _events = [];
-  final EventRepository _eventRepository = EventRepositoryImpl();
-  bool _isLoading = true;
   int _unreadCount = 0;
   final NotificationService _notificationService = NotificationService();
 
-  String get _dayOfWeek {
-    const weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
-    ];
-    return weekdays[_selectedDate.weekday - 1];
-  }
-
-  Future<void> _loadUnreadCount() async {
-    final count = await _notificationService.getUnreadCount();
-    if (!mounted) return;
-    setState(() {
-      _unreadCount = count;
-    });
-  }
-
-  String get _formattedDate {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return '${_selectedDate.day} ${months[_selectedDate.month - 1]}';
-  }
+  String get _dayOfWeek => DateFormatters.dayOfWeek(_selectedDate);
+  String get _formattedDate => DateFormatters.dayMonth(_selectedDate);
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadEvents();
+    getIt<EventRepository>().insertSampleData().whenComplete(() {
+      if (mounted) {
+        context.read<EventBloc>().add(LoadEvents());
+      }
+    });
     _loadUnreadCount();
     _notificationService.updateAppBadge();
   }
@@ -93,32 +60,16 @@ class _CalendarPageState extends State<CalendarPage>
     }
   }
 
-  Future<void> _loadEvents() async {
+  Future<void> _loadUnreadCount() async {
+    final count = await _notificationService.getUnreadCount();
+    if (!mounted) return;
     setState(() {
-      _isLoading = true;
+      _unreadCount = count;
     });
-
-    try {
-      await _eventRepository.insertSampleData();
-      final events = await _eventRepository.getEvents();
-      setState(() {
-        _events = events;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading events: $e')),
-        );
-      }
-    }
   }
 
-  List<Event> _getEventsForDay(DateTime day) {
-    return _events.where((event) {
+  List<Event> _getEventsForDay(List<Event> all, DateTime day) {
+    return all.where((event) {
       return event.startDateTime.year == day.year &&
           event.startDateTime.month == day.month &&
           event.startDateTime.day == day.day;
@@ -127,66 +78,17 @@ class _CalendarPageState extends State<CalendarPage>
 
   @override
   Widget build(BuildContext context) {
-    final eventsForSelectedDate = _getEventsForDay(_selectedDate);
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-                  children: [
-                    Text(
-                      _dayOfWeek,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _formattedDate,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(width: 8),
-                        DropdownButton(
-                          value: _selectedDate.year,
-                          items: [
-                            for (var year = 1950; year <= 2950; year++)
-                              DropdownMenuItem(
-                                value: year,
-                                child: Text(
-                                  '$year',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ),
-                          ],
-                          isDense: true,
-                          underline: Container(),
-                          dropdownColor: Colors.white,
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _selectedDate = DateTime(
-                                  value,
-                                  _selectedDate.month,
-                                  _selectedDate.day,
-                                );
-                              });
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+        title: CalendarAppBarTitle(
+          dayOfWeek: _dayOfWeek,
+          formattedDate: _formattedDate,
+          selectedDate: _selectedDate,
+          onSelectedDateChanged: (newDate) {
+            setState(() => _selectedDate = newDate);
+          },
         ),
         actions: [
           Stack(
@@ -221,84 +123,81 @@ class _CalendarPageState extends State<CalendarPage>
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  // Fixed calendar section
-                  CustomCalendar(
-                    events: _events,
-                    onDateSelected: (date) {
-                      setState(() => _selectedDate = date);
-                    },
-                  ),
-                  // Fixed header section
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Schedule',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            FocusScope.of(context).unfocus();
-                            await Future.delayed(
-                                const Duration(milliseconds: 100));
+            return BlocBuilder<EventBloc, EventState>(
+              builder: (context, state) {
+                final allEvents =
+                    state is EventLoaded ? state.events : <Event>[];
+                final eventsForSelectedDate =
+                    _getEventsForDay(allEvents, _selectedDate);
 
-                            if (mounted) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EventFormPage(
-                                    onEventSaved: (event) async {
-                                      await _eventRepository.addEvent(event);
-                                      _loadEvents();
-                                    },
-                                    selectedDate: _selectedDate,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            '+ Add Event',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: EventList(
-                        events: eventsForSelectedDate,
-                        onEventDeleted: (int id) async {
-                          await _eventRepository.deleteEvent(id);
-                          await _loadEvents();
-                        },
-                        onEventUpdated: (updatedEvent) async {
-                          await _eventRepository.updateEvent(updatedEvent);
-                          _loadEvents();
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      // Fixed calendar section
+                      CustomCalendar(
+                        events: allEvents,
+                        onDateSelected: (date) {
+                          setState(() => _selectedDate = date);
                         },
                       ),
-                    ),
+                      // Fixed header section
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Schedule',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                FocusScope.of(context).unfocus();
+                                await Future.delayed(
+                                    const Duration(milliseconds: 100));
+
+                                if (mounted) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EventFormPage(
+                                        selectedDate: _selectedDate,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                '+ Add Event',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: EventList(
+                            events: eventsForSelectedDate,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             );
           },
         ),

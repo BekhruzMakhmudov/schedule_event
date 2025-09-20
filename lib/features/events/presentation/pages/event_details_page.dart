@@ -3,17 +3,18 @@ import 'package:schedule_event/core/utils/color_mapper.dart';
 import 'package:schedule_event/core/utils/reminder_formatter.dart';
 import '../../domain/entities/event.dart';
 import 'event_form_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../presentation/bloc/bloc.dart';
+import '../../presentation/bloc/event.dart';
+import '../../../../core/services/notification_service.dart';
+import '../widgets/icon_text.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
-  final Future<void> Function(int id) onEventDeleted;
-  final Function(Event)? onEventUpdated;
 
   const EventDetailsPage({
     super.key,
     required this.event,
-    required this.onEventDeleted,
-    this.onEventUpdated,
   });
 
   @override
@@ -53,14 +54,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 MaterialPageRoute(
                   builder: (context) => EventFormPage(
                     event: currentEvent,
-                    onEventSaved: (updatedEvent) {
-                      setState(() {
-                        currentEvent = updatedEvent;
-                      });
-                      if (widget.onEventUpdated != null) {
-                        widget.onEventUpdated!(updatedEvent);
-                      }
-                    },
                   ),
                 ),
               );
@@ -112,45 +105,24 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       ?.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.access_time,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      currentEvent.timeRange,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 4),
+                IconText(
+                  icon: Icons.access_time,
+                  text: currentEvent.timeRange,
+                  color: Colors.white,
+                  iconSize: 20,
+                  fontSize: 16,
                 ),
                 const SizedBox(height: 8),
                 if (currentEvent.location!.isNotEmpty)
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          currentEvent.location!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ),
-                    ],
+                  IconText(
+                    icon: Icons.location_on,
+                    text: currentEvent.location!,
+                    color: Colors.white,
+                    iconSize: 20,
+                    fontSize: 16,
+                    expandText: true,
+                    maxLines: 2,
                   ),
               ],
             ),
@@ -217,8 +189,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 TextButton(
                                   onPressed: () async {
                                     if (currentEvent.id != null) {
-                                      await widget
-                                          .onEventDeleted(currentEvent.id!);
+                                      // Cancel notification for this event
+                                      await NotificationService()
+                                          .cancelNotification(currentEvent.id!);
+                                      context
+                                          .read<EventBloc>()
+                                          .add(DeleteExistingEvent(currentEvent.id!));
                                     }
                                     Navigator.pop(context);
                                     Navigator.pop(context);

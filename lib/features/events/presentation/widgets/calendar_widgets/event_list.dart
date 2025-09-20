@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_event/core/utils/color_mapper.dart';
-import '../../domain/entities/event.dart';
-import '../pages/event_details_page.dart';
+import '../../../domain/entities/event.dart';
+import '../../pages/event_details_page.dart';
 
 class EventList extends StatefulWidget {
   final List<Event> events;
-  final Future<void> Function(int id) onEventDeleted;
-  final Function(Event) onEventUpdated;
 
   const EventList({
     super.key,
     required this.events,
-    required this.onEventDeleted,
-    required this.onEventUpdated,
   });
 
   @override
@@ -144,8 +140,6 @@ class _EventListState extends State<EventList> {
                     MaterialPageRoute(
                       builder: (context) => EventDetailsPage(
                         event: event,
-                        onEventDeleted: widget.onEventDeleted,
-                        onEventUpdated: widget.onEventUpdated,
                       ),
                     ),
                   );
