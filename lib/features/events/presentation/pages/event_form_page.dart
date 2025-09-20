@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/event.dart';
-import '../../../../core/services/notification_service.dart';
-import 'location_picker_page.dart';
-import '../../../../core/constants/constants.dart';
-import '../../../../core/utils/color_mapper.dart';
-import '../widgets/form_widgets/form_widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../presentation/bloc/event.dart';
-import '../../presentation/bloc/bloc.dart';
+
+import '../../../../core/constants/constants.dart';
+import '../../../../core/services/notification_service.dart';
+import '../../../../core/utils/color_mapper.dart';
+import '../../domain/entities/event.dart';
+import '../bloc/bloc.dart';
+import '../bloc/event.dart';
+import '../widgets/form_widgets/form_widgets.dart';
+import 'location_picker_page.dart';
 
 class EventFormPage extends StatefulWidget {
   final Event? event; // null for add, existing event for edit
@@ -205,7 +206,6 @@ class _EventFormPageState extends State<EventFormPage> {
                         );
                         return;
                       }
-
                       // 1 << 31 equals 2^31 (range size for signed 32-bit integers) for notification id
                       final int eventId = isEditing
                           ? widget.event!.id!

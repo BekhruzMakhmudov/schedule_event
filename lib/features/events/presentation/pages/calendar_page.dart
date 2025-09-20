@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schedule_event/service_locator.dart';
+
+import '../../../../core/services/notification_service.dart';
+import '../../../../core/utils/date_formatters.dart';
 import '../../domain/entities/event.dart';
+import '../../domain/repositories/event_repository.dart';
+import '../../presentation/bloc/bloc.dart';
+import '../bloc/event.dart';
+import '../bloc/state.dart';
 import '../widgets/calendar_widgets/calendar_widgets.dart';
 import 'event_form_page.dart';
-import '../../../../core/services/notification_service.dart';
 import 'notification_page.dart';
-import '../../presentation/bloc/bloc.dart';
-import '../../presentation/bloc/state.dart';
-import '../../presentation/bloc/event.dart';
-import 'package:schedule_event/service_locator.dart';
-import '../../domain/repositories/event_repository.dart';
-import '../../../../core/utils/date_formatters.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -134,14 +135,12 @@ class _CalendarPageState extends State<CalendarPage>
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      // Fixed calendar section
                       CustomCalendar(
                         events: allEvents,
                         onDateSelected: (date) {
                           setState(() => _selectedDate = date);
                         },
                       ),
-                      // Fixed header section
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),

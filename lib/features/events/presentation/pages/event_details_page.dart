@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_event/core/utils/color_mapper.dart';
-import 'package:schedule_event/core/utils/reminder_formatter.dart';
-import '../../domain/entities/event.dart';
-import 'event_form_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../presentation/bloc/bloc.dart';
-import '../../presentation/bloc/event.dart';
+
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/utils/color_mapper.dart';
+import '../../../../core/utils/reminder_formatter.dart';
+import '../../domain/entities/event.dart';
+import '../bloc/bloc.dart';
+import '../bloc/event.dart';
 import '../widgets/icon_text.dart';
+import 'event_form_page.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
@@ -192,9 +193,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                       // Cancel notification for this event
                                       await NotificationService()
                                           .cancelNotification(currentEvent.id!);
-                                      context
-                                          .read<EventBloc>()
-                                          .add(DeleteExistingEvent(currentEvent.id!));
+                                      context.read<EventBloc>().add(
+                                          DeleteExistingEvent(
+                                              currentEvent.id!));
                                     }
                                     Navigator.pop(context);
                                     Navigator.pop(context);
