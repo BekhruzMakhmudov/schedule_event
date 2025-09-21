@@ -12,7 +12,7 @@ class EventLocalDataSource {
 
   Future<List<EventModel>> getEvents() async {
     final db = await _db;
-    final maps = await db.query('events', orderBy: 'date ASC');
+    final maps = await db.query('events', orderBy: 'startDateTime ASC');
     return maps.map((e) => EventModel.fromMap(e)).toList();
   }
 
