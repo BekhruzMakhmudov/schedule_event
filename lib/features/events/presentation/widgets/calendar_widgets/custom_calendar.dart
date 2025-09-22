@@ -165,12 +165,12 @@ class _CustomCalendarState extends State<CustomCalendar> {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? Theme.of(context).colorScheme.primary
+                          ? Colors.blue
                           : (isToday)
                               ? Theme.of(context)
                                   .colorScheme
-                                  .surfaceVariant
-                                  .withOpacity(0.6)
+                                  .surfaceContainerHighest
+                                  .withAlpha(128)
                               : null,
                       shape: BoxShape.circle,
                     ),
