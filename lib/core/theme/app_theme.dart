@@ -33,12 +33,19 @@ class AppTheme {
   static ThemeData get dark {
     const primary = Colors.blue;
     final base = ThemeData.dark(useMaterial3: true);
+    final scheme = ColorScheme.fromSeed(
+      seedColor: primary,
+      brightness: Brightness.dark,
+    );
     return base.copyWith(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primary,
-        brightness: Brightness.dark,
-      ),
+      colorScheme: scheme,
+      scaffoldBackgroundColor: scheme.surface,
       appBarTheme: base.appBarTheme.copyWith(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         elevation: 0,
       ),

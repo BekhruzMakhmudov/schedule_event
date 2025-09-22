@@ -210,7 +210,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red[50],
+                          backgroundColor: Colors.red.shade100,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -230,6 +230,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   .bodyMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
                             ),
                           ],

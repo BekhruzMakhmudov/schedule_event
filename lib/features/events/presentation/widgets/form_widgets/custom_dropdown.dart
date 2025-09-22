@@ -28,7 +28,8 @@ class CustomDropdown<T> extends StatelessWidget {
       isExpanded: isExpanded,
       alignment: Alignment.center,
       underline: Container(),
-      dropdownColor: Colors.white,
+      dropdownColor: Theme.of(context).colorScheme.surface,
+      style: Theme.of(context).textTheme.bodyMedium,
       items: items.map<DropdownMenuItem<T>>((T v) {
         return DropdownMenuItem<T>(
           value: v,
@@ -42,7 +43,7 @@ class CustomDropdown<T> extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(8),
       ),
       child: dropdown,

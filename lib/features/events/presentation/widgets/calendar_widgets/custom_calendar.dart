@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_event/core/utils/color_mapper.dart';
+
 import '../../../domain/entities/event.dart';
 
 class CustomCalendar extends StatefulWidget {
@@ -113,7 +114,11 @@ class _CustomCalendarState extends State<CustomCalendar> {
                       day,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withAlpha(70),
                         fontSize: 12,
                       ),
                     ))
@@ -160,9 +165,12 @@ class _CustomCalendarState extends State<CustomCalendar> {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? Colors.blue
+                          ? Theme.of(context).colorScheme.primary
                           : (isToday)
-                              ? Colors.grey[300]
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .surfaceVariant
+                                  .withOpacity(0.6)
                               : null,
                       shape: BoxShape.circle,
                     ),
@@ -170,7 +178,9 @@ class _CustomCalendarState extends State<CustomCalendar> {
                     child: Text(
                       "${date.day}",
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context).colorScheme.onSurface,
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.normal,
                       ),

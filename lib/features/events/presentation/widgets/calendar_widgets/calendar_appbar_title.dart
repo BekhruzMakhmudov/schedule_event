@@ -60,7 +60,9 @@ class CalendarAppBarTitle extends StatelessWidget {
                     ],
                     isDense: true,
                     underline: Container(),
-                    dropdownColor: Colors.white,
+                    dropdownColor:
+                        Theme.of(context).colorScheme.surface,
+                    style: Theme.of(context).textTheme.bodyMedium,
                     onChanged: (value) {
                       if (value != null) {
                         onSelectedDateChanged(
