@@ -12,11 +12,12 @@ class ZoomControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: scheme.surface,
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
@@ -28,14 +29,14 @@ class ZoomControls extends StatelessWidget {
           ),
           child: IconButton(
             onPressed: onZoomIn,
-            icon: const Icon(Icons.add, color: Colors.black54),
+            icon: Icon(Icons.add, color: scheme.onSurface.withOpacity(0.7)),
             iconSize: 24,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: scheme.surface,
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
@@ -47,7 +48,7 @@ class ZoomControls extends StatelessWidget {
           ),
           child: IconButton(
             onPressed: onZoomOut,
-            icon: const Icon(Icons.remove, color: Colors.black54),
+            icon: Icon(Icons.remove, color: scheme.onSurface.withOpacity(0.7)),
             iconSize: 24,
           ),
         ),

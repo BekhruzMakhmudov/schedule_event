@@ -18,9 +18,11 @@ class SearchInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -34,20 +36,24 @@ class SearchInput extends StatelessWidget {
         controller: controller,
         decoration: InputDecoration(
           hintText: 'Search for a location...',
-          hintStyle: TextStyle(color: Colors.grey[400]),
+          hintStyle:
+              textTheme.bodyMedium?.copyWith(color: scheme.onSurface.withOpacity(0.6)),
           prefixIcon: isLoading
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(12.0),
                   child: SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+                    ),
                   ),
                 )
-              : const Icon(Icons.search, color: Colors.grey),
+              : Icon(Icons.search, color: scheme.onSurfaceVariant),
           suffixIcon: controller.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.grey),
+                  icon: Icon(Icons.clear, color: scheme.onSurfaceVariant),
                   onPressed: () {
                     controller.clear();
                     onCleared?.call();
@@ -59,7 +65,7 @@ class SearchInput extends StatelessWidget {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: scheme.surface,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 12,
@@ -67,6 +73,7 @@ class SearchInput extends StatelessWidget {
         ),
         onSubmitted: onSubmitted,
         onChanged: onChanged,
+        style: textTheme.bodyMedium?.copyWith(color: scheme.onSurface),
       ),
     );
   }

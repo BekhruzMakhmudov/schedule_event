@@ -43,7 +43,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.chevron_left),
+            child: Icon(Icons.chevron_left, color: Colors.black),
           ),
           onTap: () => Navigator.pop(context),
         ),
