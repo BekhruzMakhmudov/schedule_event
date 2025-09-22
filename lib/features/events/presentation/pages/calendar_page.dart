@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:schedule_event/service_locator.dart';
 
@@ -33,13 +34,17 @@ class _CalendarPageState extends State<CalendarPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    getIt<EventRepository>().insertSampleData().whenComplete(() {
-      if (mounted) {
-        context.read<EventBloc>().add(LoadEvents());
-      }
-    });
+    _initData();
     _loadUnreadCount();
     _notificationService.updateAppBadge();
+  }
+
+  Future<void> _initData() async {
+    if (kDebugMode) {
+      await getIt<EventRepository>().insertSampleData();
+    }
+    if (!mounted) return;
+    context.read<EventBloc>().add(LoadEvents());
   }
 
   @override
