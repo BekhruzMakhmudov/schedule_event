@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -23,11 +24,41 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
   Set<Marker> _markers = {};
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
+  String? _darkMapStyle;
 
   @override
   void initState() {
     super.initState();
+    _loadMapStyle();
     _initializeLocation();
+  }
+
+  Future<void> _loadMapStyle() async {
+    try {
+      final json =
+          await rootBundle.loadString('assets/map_styles/dark_map_style.json');
+      setState(() {
+        _darkMapStyle = json;
+      });
+      _applyMapStyle();
+    } catch (e) {}
+  }
+
+  void _applyMapStyle() {
+    final controller = _mapController;
+    if (controller == null) return;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (isDark && _darkMapStyle != null) {
+      controller.setMapStyle(_darkMapStyle);
+    } else {
+      controller.setMapStyle(null);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _applyMapStyle();
   }
 
   Future<void> _initializeLocation() async {
@@ -300,6 +331,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                   markers: _markers,
                   onMapCreated: (GoogleMapController controller) {
                     _mapController = controller;
+                    _applyMapStyle();
                   },
                   onTap: _onMapTap,
                   myLocationEnabled: true,
