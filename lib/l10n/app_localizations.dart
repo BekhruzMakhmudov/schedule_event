@@ -340,6 +340,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} {unit} before'**
   String reminderBefore(Object count, Object unit);
+
+  /// No description provided for @schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get schedule;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

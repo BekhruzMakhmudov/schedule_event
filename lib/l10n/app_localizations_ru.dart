@@ -18,13 +18,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get eventDetails => 'Детали события';
 
   @override
-  String get addEvent => 'Добавить событие';
+  String get addEvent => 'Добавить';
 
   @override
-  String get editEvent => 'Редактировать событие';
+  String get editEvent => 'Изменить';
 
   @override
-  String get deleteEvent => 'Удалить событие';
+  String get deleteEvent => 'Удалить';
 
   @override
   String get location => 'Местоположение';
@@ -109,10 +109,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get endTimeAfterStart => 'Время окончания должно быть после времени начала';
 
   @override
-  String get markAllRead => 'Отметить все как прочитанные';
+  String get markAllRead => 'Отметить всех';
 
   @override
-  String get markRead => 'Отметить как прочитанное';
+  String get markRead => 'Отметить';
 
   @override
   String get noNotifications => 'Нет уведомлений';
@@ -136,4 +136,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String reminderBefore(Object count, Object unit) {
     return '$count $unit до начала';
   }
+
+  @override
+  String get schedule => 'Расписание';
 }

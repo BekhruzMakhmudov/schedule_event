@@ -41,12 +41,9 @@ class _EventFormPageState extends State<EventFormPage> {
   final _reminderOptions = kReminderOptionKeys;
 
   bool get isEditing => widget.event != null;
-  String get pageTitle => isEditing
-    ? AppLocalizations.of(context)!.editEvent
-    : AppLocalizations.of(context)!.addEvent;
   String get buttonText => isEditing
-    ? AppLocalizations.of(context)!.editEvent
-    : AppLocalizations.of(context)!.addEvent;
+      ? AppLocalizations.of(context)!.editEvent
+      : AppLocalizations.of(context)!.addEvent;
 
   @override
   void initState() {
@@ -120,8 +117,6 @@ class _EventFormPageState extends State<EventFormPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text(pageTitle),
-        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -151,8 +146,9 @@ class _EventFormPageState extends State<EventFormPage> {
                 onSuffixTap: _openLocationPicker,
               ),
               const SizedBox(height: 16),
-        Text(AppLocalizations.of(context)!.priorityColor,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(AppLocalizations.of(context)!.priorityColor,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               CustomDropdown<Color>(
                 value: _selectedColor,
@@ -164,8 +160,9 @@ class _EventFormPageState extends State<EventFormPage> {
                 wrapWithContainer: false,
               ),
               const SizedBox(height: 16),
-        Text(AppLocalizations.of(context)!.eventTime,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(AppLocalizations.of(context)!.eventTime,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               TimeRangePicker(
                 startTime: _startTime,
@@ -174,19 +171,27 @@ class _EventFormPageState extends State<EventFormPage> {
                 onEndChanged: (t) => setState(() => _endTime = t),
               ),
               const SizedBox(height: 16),
-        Text(AppLocalizations.of(context)!.reminder,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                AppLocalizations.of(context)!.reminder,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 12),
               CustomDropdown<int>(
                 value: _reminderTime,
                 items: _reminderOptions.toList(),
                 onChanged: (value) => setState(() => _reminderTime = value),
-                itemBuilder: (key) => Row(
+                itemBuilder: (minutes) => Row(
                   children: [
                     const Icon(Icons.notifications,
                         color: Colors.blue, size: 20),
                     const SizedBox(width: 8),
-                    Text(formatReminderTime(context, _reminderOptions[key])),
+                    Text(
+                      formatReminderTime(context, minutes),
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ],
                 ),
                 isExpanded: true,
@@ -205,7 +210,8 @@ class _EventFormPageState extends State<EventFormPage> {
                       if (end.isBefore(start)) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(AppLocalizations.of(context)!.endTimeAfterStart),
+                            content: Text(AppLocalizations.of(context)!
+                                .endTimeAfterStart),
                           ),
                         );
                         return;
@@ -240,7 +246,8 @@ class _EventFormPageState extends State<EventFormPage> {
                       await NotificationService().scheduleEventReminder(
                         eventId: event.id!,
                         eventTitle: event.title,
-                        eventDescription: '${formatReminderTime(context, event.reminderTime)} ${event.description}',
+                        eventDescription:
+                            '${formatReminderTime(context, event.reminderTime)} ${event.description}',
                         eventStartTime: event.startDateTime,
                         reminderMinutes: event.reminderTime,
                       );

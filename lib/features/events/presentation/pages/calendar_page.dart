@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schedule_event/l10n/app_localizations.dart';
 import 'package:schedule_event/service_locator.dart';
 
 import '../../../../core/services/notification_service.dart';
@@ -27,8 +28,8 @@ class _CalendarPageState extends State<CalendarPage>
   int _unreadCount = 0;
   final NotificationService _notificationService = NotificationService();
 
-  String get _dayOfWeek => DateFormatters.dayOfWeek(_selectedDate);
-  String get _formattedDate => DateFormatters.dayMonth(_selectedDate);
+  String _dayOfWeek(BuildContext context) => DateFormatters.dayOfWeek(_selectedDate, locale: Localizations.localeOf(context).toString());
+  String _formattedDate(BuildContext context) => DateFormatters.dayMonth(_selectedDate, locale: Localizations.localeOf(context).toString());
 
   @override
   void initState() {
@@ -89,8 +90,8 @@ class _CalendarPageState extends State<CalendarPage>
       appBar: AppBar(
         scrolledUnderElevation: 0,
         title: CalendarAppBarTitle(
-          dayOfWeek: _dayOfWeek,
-          formattedDate: _formattedDate,
+          dayOfWeek: _dayOfWeek(context),
+          formattedDate: _formattedDate(context),
           selectedDate: _selectedDate,
           onSelectedDateChanged: (newDate) {
             setState(() => _selectedDate = newDate);
@@ -152,9 +153,9 @@ class _CalendarPageState extends State<CalendarPage>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Schedule',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.schedule,
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -182,9 +183,9 @@ class _CalendarPageState extends State<CalendarPage>
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              child: const Text(
-                                '+ Add Event',
-                                style: TextStyle(color: Colors.white),
+                              child: Text(
+                                AppLocalizations.of(context)!.addEvent,
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
                           ],

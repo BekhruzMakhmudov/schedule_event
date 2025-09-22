@@ -136,4 +136,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String reminderBefore(Object count, Object unit) {
     return '$count $unit before';
   }
+
+  @override
+  String get schedule => 'Schedule';
 }

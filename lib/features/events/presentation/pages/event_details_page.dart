@@ -228,7 +228,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Delete Event',
+                              AppLocalizations.of(context)!.deleteEvent,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium

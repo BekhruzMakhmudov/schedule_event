@@ -2,9 +2,9 @@
   "appTitle": "Планировщик событий",
   "calendar": "Календарь",
   "eventDetails": "Детали события",
-  "addEvent": "Добавить событие",
-  "editEvent": "Редактировать событие",
-  "deleteEvent": "Удалить событие",
+  "addEvent": "Добавить",
+  "editEvent": "Изменить",
+  "deleteEvent": "Удалить",
   "location": "Местоположение",
   "notification": "Уведомление",
   "save": "Сохранить",
@@ -31,8 +31,8 @@
   "priorityColor": "Цвет приоритета",
   "eventTime": "Время события",
   "endTimeAfterStart": "Время окончания должно быть после времени начала",
-  "markAllRead": "Отметить все как прочитанные",
-  "markRead": "Отметить как прочитанное",
+  "markAllRead": "Отметить всех",
+  "markRead": "Отметить",
   "noNotifications": "Нет уведомлений",
   "noEventsForDay": "Нет событий на этот день",
   "eventReminders": "Напоминания о событиях",
@@ -41,5 +41,6 @@
   "hour": "час",
   "hours": "часа",
   "day": "день",
-  "reminderBefore": "{count} {unit} до начала"
+  "reminderBefore": "{count} {unit} до начала",
+  "schedule": "Расписание"
 }

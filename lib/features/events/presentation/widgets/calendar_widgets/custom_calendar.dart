@@ -52,7 +52,10 @@ class _CustomCalendarState extends State<CustomCalendar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                DateFormatters.monthName(_focusedDate),
+                DateFormatters.monthName(
+                  _focusedDate,
+                  locale: Localizations.localeOf(context).toString(),
+                ),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -96,7 +99,10 @@ class _CustomCalendarState extends State<CustomCalendar> {
             children: List.generate(7, (i) {
               final date = DateTime(2020, 9, 20 + i); // Sunday = 20 Sep 2020
               return Text(
-                DateFormatters.shortDayOfWeek(date),
+                DateFormatters.shortDayOfWeek(
+                  date,
+                  locale: Localizations.localeOf(context).toString(),
+                ),
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 12,

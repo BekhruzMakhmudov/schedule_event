@@ -41,5 +41,6 @@
   "hour": "hour",
   "hours": "hours",
   "day": "day",
-  "reminderBefore": "{count} {unit} before"
+  "reminderBefore": "{count} {unit} before",
+  "schedule": "Schedule"
 }
