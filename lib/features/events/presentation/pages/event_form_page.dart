@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schedule_event/core/utils/reminder_formatter.dart';
+import 'package:schedule_event/l10n/app_localizations.dart';
 
 import '../../../../core/constants/constants.dart';
 import '../../../../core/services/notification_service.dart';
@@ -36,11 +38,15 @@ class _EventFormPageState extends State<EventFormPage> {
   late int _reminderTime;
 
   final _colorOptions = kEventColorOptions;
-  final _reminderOptions = kReminderOptions;
+  final _reminderOptions = kReminderOptionKeys;
 
   bool get isEditing => widget.event != null;
-  String get pageTitle => isEditing ? 'Edit Event' : 'Add Event';
-  String get buttonText => isEditing ? 'Update Event' : 'Add Event';
+  String get pageTitle => isEditing
+    ? AppLocalizations.of(context)!.editEvent
+    : AppLocalizations.of(context)!.addEvent;
+  String get buttonText => isEditing
+    ? AppLocalizations.of(context)!.editEvent
+    : AppLocalizations.of(context)!.addEvent;
 
   @override
   void initState() {
@@ -125,28 +131,28 @@ class _EventFormPageState extends State<EventFormPage> {
             children: [
               const SizedBox(height: 0),
               CustomInput(
-                title: 'Event name',
+                title: AppLocalizations.of(context)!.eventName,
                 controller: _nameController,
-                hintText: 'Enter event name',
+                hintText: AppLocalizations.of(context)!.enterEventName,
               ),
               const SizedBox(height: 16),
               CustomInput(
-                title: 'Event description',
+                title: AppLocalizations.of(context)!.eventDescription,
                 controller: _descriptionController,
-                hintText: 'Enter event description',
+                hintText: AppLocalizations.of(context)!.enterEventDescription,
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
               CustomInput(
-                title: 'Event location',
+                title: AppLocalizations.of(context)!.eventLocation,
                 controller: _locationController,
-                hintText: 'Enter location',
+                hintText: AppLocalizations.of(context)!.enterLocation,
                 suffixIcon: Icons.location_on,
                 onSuffixTap: _openLocationPicker,
               ),
               const SizedBox(height: 16),
-              const Text('Priority color',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(AppLocalizations.of(context)!.priorityColor,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               CustomDropdown<Color>(
                 value: _selectedColor,
@@ -158,8 +164,8 @@ class _EventFormPageState extends State<EventFormPage> {
                 wrapWithContainer: false,
               ),
               const SizedBox(height: 16),
-              const Text('Event time',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(AppLocalizations.of(context)!.eventTime,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               TimeRangePicker(
                 startTime: _startTime,
@@ -168,19 +174,19 @@ class _EventFormPageState extends State<EventFormPage> {
                 onEndChanged: (t) => setState(() => _endTime = t),
               ),
               const SizedBox(height: 16),
-              const Text('Reminder',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(AppLocalizations.of(context)!.reminder,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               CustomDropdown<int>(
                 value: _reminderTime,
-                items: _reminderOptions.keys.toList(),
+                items: _reminderOptions.toList(),
                 onChanged: (value) => setState(() => _reminderTime = value),
                 itemBuilder: (key) => Row(
                   children: [
                     const Icon(Icons.notifications,
                         color: Colors.blue, size: 20),
                     const SizedBox(width: 8),
-                    Text(_reminderOptions[key]!),
+                    Text(formatReminderTime(context, _reminderOptions[key])),
                   ],
                 ),
                 isExpanded: true,
@@ -198,8 +204,8 @@ class _EventFormPageState extends State<EventFormPage> {
 
                       if (end.isBefore(start)) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('End time must be after start time'),
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)!.endTimeAfterStart),
                           ),
                         );
                         return;
@@ -234,7 +240,7 @@ class _EventFormPageState extends State<EventFormPage> {
                       await NotificationService().scheduleEventReminder(
                         eventId: event.id!,
                         eventTitle: event.title,
-                        eventDescription: event.description,
+                        eventDescription: '${formatReminderTime(context, event.reminderTime)} ${event.description}',
                         eventStartTime: event.startDateTime,
                         reminderMinutes: event.reminderTime,
                       );

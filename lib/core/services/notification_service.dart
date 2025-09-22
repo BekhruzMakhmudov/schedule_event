@@ -8,7 +8,6 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../database/app_database.dart';
-import '../utils/reminder_formatter.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -136,7 +135,7 @@ class NotificationService {
     await _notifications.zonedSchedule(
       _normalizeId(eventId),
       eventTitle,
-      'Event starts in ${formatReminderTime(reminderMinutes)} $eventDescription',
+      eventDescription,
       scheduledTz,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -149,8 +148,7 @@ class NotificationService {
     await _insertNotification(
       eventId: eventId,
       title: eventTitle,
-      body:
-          'Event starts in ${formatReminderTime(reminderMinutes)} $eventDescription',
+      body: eventDescription,
       scheduledAt: DateTime.now().millisecondsSinceEpoch,
       deliveredAt: scheduledDate.millisecondsSinceEpoch,
     );

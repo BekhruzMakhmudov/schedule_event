@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_event/core/utils/color_mapper.dart';
+import 'package:schedule_event/l10n/app_localizations.dart';
+
 import '../../../domain/entities/event.dart';
 import '../../pages/event_details_page.dart';
 
@@ -27,10 +29,10 @@ class _EventListState extends State<EventList> {
   @override
   Widget build(BuildContext context) {
     if (widget.events.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'No events for this day',
-          style: TextStyle(
+          AppLocalizations.of(context)!.noEventsForDay,
+          style: const TextStyle(
             fontSize: 16,
             color: Colors.grey,
           ),

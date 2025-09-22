@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_event/l10n/app_localizations.dart';
 
 class SearchInput extends StatelessWidget {
   final TextEditingController controller;
@@ -35,7 +36,7 @@ class SearchInput extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          hintText: 'Search for a location...',
+          hintText: AppLocalizations.of(context)!.searchLocationHint,
           hintStyle:
               textTheme.bodyMedium?.copyWith(color: scheme.onSurface.withOpacity(0.6)),
           prefixIcon: isLoading

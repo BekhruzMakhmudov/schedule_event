@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_event/l10n/app_localizations.dart';
+
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/utils/color_mapper.dart';
 
@@ -49,24 +51,24 @@ class _NotificationPageState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(AppLocalizations.of(context)!.notification),
         actions: [
           TextButton(
             onPressed: _markAllAsRead,
-            child: const Text(
-              'Mark all read',
-              style: TextStyle(color: Colors.blue),
+            child: Text(
+              AppLocalizations.of(context)!.markAllRead,
+              style: const TextStyle(color: Colors.blue),
             ),
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: _load,
-        child: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : _items.isEmpty
-                ? const Center(child: Text('No notifications'))
-                : ListView.separated(
+    child: _loading
+      ? const Center(child: CircularProgressIndicator())
+      : _items.isEmpty
+        ? Center(child: Text(AppLocalizations.of(context)!.noNotifications))
+        : ListView.separated(
                     padding: const EdgeInsets.all(8),
                     itemCount: _items.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 8),
@@ -127,7 +129,7 @@ class _NotificationPageState extends State<NotificationPage> {
                             trailing: TextButton(
                               onPressed: () => _markAsRead(id),
                               child: Text(
-                                'Mark read',
+                                AppLocalizations.of(context)!.markRead,
                                 style: TextStyle(color: baseColor),
                               ),
                             ),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:schedule_event/l10n/app_localizations.dart';
 
 import '../../../../core/services/location_permission_service.dart';
 import '../widgets/map_widgets/map_widgets.dart';
@@ -219,12 +220,12 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
             markerId: const MarkerId("selectedLocation"),
             position: _selectedLocation!,
             infoWindow: InfoWindow(
-              title: _selectedAddress.isNotEmpty
-                  ? 'Selected Location'
-                  : 'Current Location',
-              snippet: _selectedAddress.isNotEmpty
-                  ? _selectedAddress
-                  : 'Tap to select a location',
+        title: _selectedAddress.isNotEmpty
+          ? AppLocalizations.of(context)!.selectedLocation
+          : AppLocalizations.of(context)!.currentLocation,
+        snippet: _selectedAddress.isNotEmpty
+          ? _selectedAddress
+          : AppLocalizations.of(context)!.tapToSelectLocation,
             ),
           ),
         };
@@ -294,7 +295,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Location "$query" not found'),
+            content: Text(AppLocalizations.of(context)!.locationNotFound(query)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

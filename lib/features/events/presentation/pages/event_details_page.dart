@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schedule_event/l10n/app_localizations.dart';
 
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/utils/color_mapper.dart';
@@ -63,9 +64,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               children: [
                 Icon(Icons.edit, color: Colors.white),
                 const SizedBox(width: 4),
-                const Text(
-                  'Edit',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.editEvent,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -135,25 +136,25 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Reminder',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.reminder,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${formatReminderTime(currentEvent.reminderTime)} before',
+                    formatReminderTime(context, currentEvent.reminderTime),
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Description',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.description,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -162,7 +163,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   Text(
                     currentEvent.description.isNotEmpty
                         ? currentEvent.description
-                        : 'No description provided',
+                        : AppLocalizations.of(context)!.noDescription,
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
@@ -180,13 +181,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text('Delete Event'),
-                              content: const Text(
-                                  'Are you sure you want to delete this event?'),
+                              title: Text(
+                                  AppLocalizations.of(context)!.deleteEvent),
+                              content: Text(AppLocalizations.of(context)!
+                                  .deleteEventConfirm),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
+                                  child: Text(
+                                      AppLocalizations.of(context)!.cancel),
                                 ),
                                 TextButton(
                                   onPressed: () async {
@@ -201,9 +204,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                     Navigator.pop(context);
                                     Navigator.pop(context);
                                   },
-                                  child: const Text(
-                                    'Delete',
-                                    style: TextStyle(color: Colors.red),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.deleteEvent,
+                                    style: const TextStyle(color: Colors.red),
                                   ),
                                 ),
                               ],

@@ -39,8 +39,6 @@ class IconText extends StatelessWidget {
         fontWeight: fontWeight,
       ),
     );
-
-    // If expandText is true, wrap only the text with Expanded, not the whole row.
     final double gap = (spacing is EdgeInsets)
         ? (spacing as EdgeInsets).left
         : 8;

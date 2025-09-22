@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_event/core/utils/color_mapper.dart';
+import 'package:schedule_event/core/utils/date_formatters.dart';
 
 import '../../../domain/entities/event.dart';
 
@@ -21,23 +22,6 @@ class _CustomCalendarState extends State<CustomCalendar> {
   DateTime _focusedDate = DateTime.now();
   DateTime? _selectedDate = DateTime.now();
 
-  String _getMonthName(int month) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return months[month - 1];
-  }
 
   List<DateTime?> _getCalendarDays(DateTime month) {
     final firstDay = DateTime(month.year, month.month, 1);
@@ -68,7 +52,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _getMonthName(_focusedDate.month),
+                DateFormatters.monthName(_focusedDate),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -109,20 +93,16 @@ class _CustomCalendarState extends State<CustomCalendar> {
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-                .map((day) => Text(
-                      day,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withAlpha(70),
-                        fontSize: 12,
-                      ),
-                    ))
-                .toList(),
+            children: List.generate(7, (i) {
+              final date = DateTime(2020, 9, 20 + i); // Sunday = 20 Sep 2020
+              return Text(
+                DateFormatters.shortDayOfWeek(date),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                ),
+              );
+            }),
           ),
         ),
         GridView.builder(

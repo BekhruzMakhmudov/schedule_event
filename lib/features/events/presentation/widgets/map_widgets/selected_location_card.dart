@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_event/l10n/app_localizations.dart';
 
 class SelectedLocationCard extends StatelessWidget {
   final String address;
@@ -31,21 +32,23 @@ class SelectedLocationCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Selected Location:',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withOpacity(0.7),
-                ),
-          ),
+      Text(
+    AppLocalizations.of(context)!.selectedLocation,
+    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: Theme.of(context)
+          .textTheme
+          .bodySmall
+          ?.color
+          ?.withOpacity(0.7),
+        ),
+      ),
           const SizedBox(height: 4),
           Text(
-            address.isNotEmpty ? address : 'Tap on the map to select a location',
+            address.isNotEmpty
+                ? address
+                : AppLocalizations.of(context)!.tapToSelectLocation,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -65,7 +68,7 @@ class SelectedLocationCard extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Confirm Location',
+                AppLocalizations.of(context)!.confirmLocation,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 16,

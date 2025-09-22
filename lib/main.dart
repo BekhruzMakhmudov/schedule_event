@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Locale systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
+    final Locale appLocale = systemLocale.languageCode == 'ru' ? const Locale('ru') : const Locale('en');
+
     return BlocProvider<EventBloc>(
       create: (context) {
         return getIt<EventBloc>()..add(LoadEvents());
@@ -30,6 +34,16 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.system,
         home: const CalendarPage(),
         debugShowCheckedModeBanner: false,
+        locale: appLocale,
+        supportedLocales: const [
+          Locale('en'),
+          Locale('ru'),
+        ],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
       ),
     );
   }
