@@ -1,11 +1,14 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
-import '../database/app_database.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+import '../database/app_database.dart';
+import '../utils/reminder_formatter.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -132,8 +135,8 @@ class NotificationService {
 
     await _notifications.zonedSchedule(
       _normalizeId(eventId),
-      'Upcoming Event: $eventTitle',
-      'Event starts in $reminderMinutes minutes${eventDescription.isNotEmpty ? '\n$eventDescription' : ''}',
+      eventTitle,
+      'Event starts in ${formatReminderTime(reminderMinutes)} $eventDescription',
       scheduledTz,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -145,9 +148,9 @@ class NotificationService {
     // Persist as unread notification entry
     await _insertNotification(
       eventId: eventId,
-      title: 'Upcoming Event: $eventTitle',
+      title: eventTitle,
       body:
-          'Event starts in $reminderMinutes minutes${eventDescription.isNotEmpty ? '\n$eventDescription' : ''}',
+          'Event starts in ${formatReminderTime(reminderMinutes)} $eventDescription',
       scheduledAt: DateTime.now().millisecondsSinceEpoch,
       deliveredAt: scheduledDate.millisecondsSinceEpoch,
     );

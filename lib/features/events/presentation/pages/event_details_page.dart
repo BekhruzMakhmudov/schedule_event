@@ -144,7 +144,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    formatReminderTime(currentEvent.reminderTime),
+                    '${formatReminderTime(currentEvent.reminderTime)} before',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
