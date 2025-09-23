@@ -82,7 +82,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get confirmLocation => 'Confirm Location';
+  String get confirm => 'Confirm';
 
   @override
   String get searchLocationHint => 'Search for a location...';

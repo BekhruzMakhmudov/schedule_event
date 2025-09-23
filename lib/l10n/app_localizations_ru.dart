@@ -82,7 +82,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get confirmLocation => 'Подтвердить местоположение';
+  String get confirm => 'Подтвердить';
 
   @override
   String get searchLocationHint => 'Поиск местоположения...';

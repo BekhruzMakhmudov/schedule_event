@@ -68,7 +68,7 @@ class SelectedLocationCard extends StatelessWidget {
                 ),
               ),
               child: Text(
-                AppLocalizations.of(context)!.confirmLocation,
+                AppLocalizations.of(context)!.confirm,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 16,

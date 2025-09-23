@@ -22,7 +22,7 @@
   "eventReminders": "Напоминания о событиях",
   "notificationsForUpcomingEvents": "Уведомления о предстоящих событиях",
   "eventStartsIn": "Событие начнётся через {reminder} {description}",
-  "confirmLocation": "Подтвердить местоположение",
+  "confirm": "Подтвердить",
   "searchLocationHint": "Поиск местоположения...",
   "description": "Описание",
   "noDescription": "Описание отсутствует",

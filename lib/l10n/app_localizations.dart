@@ -233,11 +233,11 @@ abstract class AppLocalizations {
   /// **'Event starts in {reminder} {description}'**
   String eventStartsIn(Object description, Object reminder);
 
-  /// No description provided for @confirmLocation.
+  /// No description provided for @confirm.
   ///
   /// In en, this message translates to:
-  /// **'Confirm Location'**
-  String get confirmLocation;
+  /// **'Confirm'**
+  String get confirm;
 
   /// No description provided for @searchLocationHint.
   ///

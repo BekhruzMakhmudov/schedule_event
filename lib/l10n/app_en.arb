@@ -22,7 +22,7 @@
   "eventReminders": "Event Reminders",
   "notificationsForUpcomingEvents": "Notifications for upcoming events",
   "eventStartsIn": "Event starts in {reminder} {description}",
-  "confirmLocation": "Confirm Location",
+  "confirm": "Confirm",
   "searchLocationHint": "Search for a location...",
   "description": "Description",
   "noDescription": "No description provided",
