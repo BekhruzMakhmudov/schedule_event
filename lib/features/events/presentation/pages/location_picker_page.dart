@@ -108,9 +108,9 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Location services are disabled'),
+              content: Text(AppLocalizations.of(context)!.locationServicesDisabled),
               action: SnackBarAction(
-                label: 'Open Settings',
+                label: AppLocalizations.of(context)!.openSettings,
                 onPressed: () {
                   permissionService.openLocationSettings();
                 },
@@ -131,11 +131,11 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(permanentlyDenied
-                  ? 'Location permission is permanently denied'
-                  : 'Location permission is required'),
+                  ? AppLocalizations.of(context)!.locationPermissionPermanentlyDenied
+                  : AppLocalizations.of(context)!.locationPermissionRequired),
               action: permanentlyDenied
                   ? SnackBarAction(
-                      label: 'Open Settings',
+                      label: AppLocalizations.of(context)!.openSettings,
                       onPressed: () {
                         permissionService.openAppSettings();
                       },
@@ -206,7 +206,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
       print('Error getting address for tapped location: $e');
       setState(() {
         _selectedLocation = location;
-        _selectedAddress = 'Unknown location';
+        _selectedAddress = AppLocalizations.of(context)!.locationNotFound(location);
       });
       _updateMarkers();
     }
@@ -317,7 +317,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Select Location'),
+        title: Text(AppLocalizations.of(context)!.selectLocation),
         centerTitle: true,
       ),
       body: _isLoading || _selectedLocation == null

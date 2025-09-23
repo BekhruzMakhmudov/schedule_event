@@ -185,6 +185,36 @@ abstract class AppLocalizations {
   /// **'Location \'{query}\' not found'**
   String locationNotFound(Object query);
 
+  /// No description provided for @locationServicesDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are disabled'**
+  String get locationServicesDisabled;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
+
+  /// No description provided for @locationPermissionPermanentlyDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is permanently denied'**
+  String get locationPermissionPermanentlyDenied;
+
+  /// No description provided for @locationPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is required'**
+  String get locationPermissionRequired;
+
+  /// No description provided for @selectLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Location'**
+  String get selectLocation;
+
   /// No description provided for @eventReminders.
   ///
   /// In en, this message translates to:

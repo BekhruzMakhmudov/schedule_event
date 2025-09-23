@@ -56,6 +56,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get locationServicesDisabled => 'Location services are disabled';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get locationPermissionPermanentlyDenied => 'Location permission is permanently denied';
+
+  @override
+  String get locationPermissionRequired => 'Location permission is required';
+
+  @override
+  String get selectLocation => 'Select Location';
+
+  @override
   String get eventReminders => 'Event Reminders';
 
   @override

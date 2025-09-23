@@ -56,6 +56,21 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get locationServicesDisabled => 'Службы геолокации отключены';
+
+  @override
+  String get openSettings => 'Открыть настройки';
+
+  @override
+  String get locationPermissionPermanentlyDenied => 'Доступ к геолокации навсегда запрещён';
+
+  @override
+  String get locationPermissionRequired => 'Требуется разрешение на геолокацию';
+
+  @override
+  String get selectLocation => 'Выберите место';
+
+  @override
   String get eventReminders => 'Напоминания о событиях';
 
   @override
