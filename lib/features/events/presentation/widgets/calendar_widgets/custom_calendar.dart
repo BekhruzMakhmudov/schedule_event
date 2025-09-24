@@ -23,13 +23,22 @@ class _CustomCalendarState extends State<CustomCalendar> {
   DateTime? _selectedDate = DateTime.now();
 
 
-  List<DateTime?> _getCalendarDays(DateTime month) {
+  int _getSystemFirstDayOfWeek(BuildContext context) {
+    final locale = Localizations.localeOf(context).toString();
+    if (locale.startsWith('ru')) {
+      return DateTime.monday;
+    }
+    return DateTime.sunday;
+  }
+
+  List<DateTime?> _getCalendarDays(DateTime month, int firstDayOfWeek) {
     final firstDay = DateTime(month.year, month.month, 1);
     final lastDay = DateTime(month.year, month.month + 1, 0);
-    final startWeekday = firstDay.weekday % 7; // чтобы Sunday был 0
+    int shift = (firstDay.weekday - firstDayOfWeek) % 7;
+    if (shift < 0) shift += 7;
     List<DateTime?> days = [];
 
-    for (int i = 0; i < startWeekday; i++) {
+    for (int i = 0; i < shift; i++) {
       days.add(null);
     }
 
@@ -42,7 +51,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    final days = _getCalendarDays(_focusedDate);
+  final firstDayOfWeek = _getSystemFirstDayOfWeek(context);
+  final days = _getCalendarDays(_focusedDate, firstDayOfWeek);
 
     return Column(
       children: [
@@ -97,7 +107,10 @@ class _CustomCalendarState extends State<CustomCalendar> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(7, (i) {
-              final date = DateTime(2020, 9, 20 + i); // Sunday = 20 Sep 2020
+              // Динамически вычисляем день недели, начиная с системного первого дня
+              final weekday = (firstDayOfWeek + i - 1) % 7 + 1;
+              // 2020-09-20 - это воскресенье, 2020-09-21 - понедельник и т.д.
+              final date = DateTime(2020, 9, 20 + weekday - 7 * ((weekday < 7) ? 0 : 1));
               return Text(
                 DateFormatters.shortDayOfWeek(
                   date,
