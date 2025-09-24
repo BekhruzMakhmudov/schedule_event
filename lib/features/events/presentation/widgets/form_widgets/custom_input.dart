@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomInput extends StatelessWidget {
-  final String title;
   final TextEditingController controller;
-  final String hintText;
+  final String label;
   final int maxLines;
   final IconData? suffixIcon;
   final VoidCallback? onSuffixTap;
@@ -11,9 +10,8 @@ class CustomInput extends StatelessWidget {
 
   const CustomInput({
     super.key,
-    required this.title,
     required this.controller,
-    required this.hintText,
+    required this.label,
     this.maxLines = 1,
     this.suffixIcon,
     this.onSuffixTap,
@@ -29,33 +27,22 @@ class CustomInput extends StatelessWidget {
           )
         : null;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        suffixIcon: suffix,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
         ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          maxLines: maxLines,
-          keyboardType: keyboardType,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey[400]),
-            suffixIcon: suffix,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.blue),
-            ),
-          ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.blue),
         ),
-      ],
+      ),
     );
   }
 }

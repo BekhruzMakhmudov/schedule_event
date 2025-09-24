@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TimeRangePicker extends StatelessWidget {
@@ -14,15 +15,60 @@ class TimeRangePicker extends StatelessWidget {
     required this.onEndChanged,
   });
 
-  Future<void> _pickTime(BuildContext context, {
+  Future<void> _showScrollablePicker(
+    BuildContext context, {
     required TimeOfDay initial,
     required ValueChanged<TimeOfDay> onChanged,
   }) async {
-    final time = await showTimePicker(
+    int selectedHour = initial.hour;
+    int selectedMinute = initial.minute;
+
+    await showModalBottomSheet(
       context: context,
-      initialTime: initial,
+      builder: (context) {
+        return SizedBox(
+          height: 250,
+          child: Row(
+            children: [
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(
+                    initialItem: selectedHour,
+                  ),
+                  itemExtent: 40,
+                  onSelectedItemChanged: (i) => selectedHour = i,
+                  children: List.generate(
+                    24,
+                    (i) => Center(child: Text(i.toString().padLeft(2, '0'))),
+                  ),
+                ),
+              ),
+              const Text(":", style: TextStyle(fontSize: 24)),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(
+                    initialItem: selectedMinute,
+                  ),
+                  itemExtent: 40,
+                  onSelectedItemChanged: (i) => selectedMinute = i,
+                  children: List.generate(
+                    60,
+                    (i) => Center(child: Text(i.toString().padLeft(2, '0'))),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.check),
+                onPressed: () {
+                  Navigator.pop(context);
+                  onChanged(TimeOfDay(hour: selectedHour, minute: selectedMinute));
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
-    if (time != null) onChanged(time);
   }
 
   @override
@@ -47,7 +93,7 @@ class TimeRangePicker extends StatelessWidget {
         Expanded(
           child: _timeBox(
             startTime.format(context),
-            () => _pickTime(
+            () => _showScrollablePicker(
               context,
               initial: startTime,
               onChanged: onStartChanged,
@@ -61,7 +107,7 @@ class TimeRangePicker extends StatelessWidget {
         Expanded(
           child: _timeBox(
             endTime.format(context),
-            () => _pickTime(
+            () => _showScrollablePicker(
               context,
               initial: endTime,
               onChanged: onEndChanged,

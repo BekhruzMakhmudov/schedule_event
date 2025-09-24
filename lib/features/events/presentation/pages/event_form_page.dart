@@ -120,28 +120,28 @@ class _EventFormPageState extends State<EventFormPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 0),
               CustomInput(
-                title: AppLocalizations.of(context)!.eventName,
                 controller: _nameController,
-                hintText: AppLocalizations.of(context)!.enterEventName,
+                label: AppLocalizations.of(context)!.eventName,
               ),
               const SizedBox(height: 16),
               CustomInput(
-                title: AppLocalizations.of(context)!.eventDescription,
                 controller: _descriptionController,
-                hintText: AppLocalizations.of(context)!.enterEventDescription,
+                label: AppLocalizations.of(context)!.eventDescription,
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
               CustomInput(
-                title: AppLocalizations.of(context)!.eventLocation,
                 controller: _locationController,
-                hintText: AppLocalizations.of(context)!.enterLocation,
+                label: AppLocalizations.of(context)!.location,
                 suffixIcon: Icons.location_on,
                 onSuffixTap: _openLocationPicker,
               ),

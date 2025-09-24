@@ -100,19 +100,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventName => 'Event name';
 
   @override
-  String get enterEventName => 'Enter event name';
-
-  @override
   String get eventDescription => 'Event description';
 
   @override
-  String get enterEventDescription => 'Enter event description';
-
-  @override
   String get eventLocation => 'Event location';
-
-  @override
-  String get enterLocation => 'Enter location';
 
   @override
   String get priorityColor => 'Priority color';

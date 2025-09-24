@@ -100,19 +100,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get eventName => 'Название события';
 
   @override
-  String get enterEventName => 'Введите название события';
-
-  @override
   String get eventDescription => 'Описание события';
 
   @override
-  String get enterEventDescription => 'Введите описание события';
-
-  @override
   String get eventLocation => 'Место проведения';
-
-  @override
-  String get enterLocation => 'Введите место проведения';
 
   @override
   String get priorityColor => 'Цвет приоритета';

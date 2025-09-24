@@ -269,35 +269,17 @@ abstract class AppLocalizations {
   /// **'Event name'**
   String get eventName;
 
-  /// No description provided for @enterEventName.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter event name'**
-  String get enterEventName;
-
   /// No description provided for @eventDescription.
   ///
   /// In en, this message translates to:
   /// **'Event description'**
   String get eventDescription;
 
-  /// No description provided for @enterEventDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter event description'**
-  String get enterEventDescription;
-
   /// No description provided for @eventLocation.
   ///
   /// In en, this message translates to:
   /// **'Event location'**
   String get eventLocation;
-
-  /// No description provided for @enterLocation.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter location'**
-  String get enterLocation;
 
   /// No description provided for @priorityColor.
   ///
