@@ -8,6 +8,7 @@ import '../../../domain/entities/event.dart';
 import '../../bloc/bloc.dart';
 import '../../bloc/event.dart';
 import '../../pages/event_details_page.dart';
+import '../../pages/event_form_page.dart';
 
 class EventList extends StatefulWidget {
   final List<Event> events;
@@ -53,23 +54,42 @@ class _EventListState extends State<EventList> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Dismissible(
             key: ValueKey(event.id ?? event.hashCode),
-            direction: DismissDirection.endToStart,
+            direction: DismissDirection.horizontal,
             background: Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: const Icon(Icons.edit, color: Colors.blue),
+            ),
+            secondaryBackground: Container(
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: const Icon(Icons.delete, color: Colors.red),
             ),
-            onDismissed: (direction) async {
-              final eventToDelete = widget.events[index];
-              if (eventToDelete.id != null) {
-                await NotificationService().cancelNotification(eventToDelete.id!);
-                context
-                    .read<EventBloc>()
-                    .add(DeleteExistingEvent(eventToDelete.id!));
+            confirmDismiss: (direction) async {
+              if (direction == DismissDirection.startToEnd) {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EventFormPage(event: event),
+                  ),
+                );
+                return false;
               }
-              setState(() {
-                widget.events.removeAt(index);
-              });
+              return true;
+            },
+            onDismissed: (direction) async {
+              if (direction == DismissDirection.endToStart) {
+                final eventToDelete = widget.events[index];
+                if (eventToDelete.id != null) {
+                  await NotificationService().cancelNotification(eventToDelete.id!);
+                  context
+                      .read<EventBloc>()
+                      .add(DeleteExistingEvent(eventToDelete.id!));
+                }
+                setState(() {
+                  widget.events.removeAt(index);
+                });
+              }
             },
             child: Column(
               children: [
