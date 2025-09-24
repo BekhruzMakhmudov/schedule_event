@@ -28,8 +28,12 @@ class _CalendarPageState extends State<CalendarPage>
   int _unreadCount = 0;
   final NotificationService _notificationService = NotificationService();
 
-  String _dayOfWeek(BuildContext context) => DateFormatters.dayOfWeek(_selectedDate, locale: Localizations.localeOf(context).toString());
-  String _formattedDate(BuildContext context) => DateFormatters.dayMonth(_selectedDate, locale: Localizations.localeOf(context).toString());
+  String _dayOfWeek(BuildContext context) =>
+      DateFormatters.dayOfWeek(_selectedDate,
+          locale: Localizations.localeOf(context).toString());
+  String _formattedDate(BuildContext context) =>
+      DateFormatters.dayMonth(_selectedDate,
+          locale: Localizations.localeOf(context).toString());
 
   @override
   void initState() {
@@ -137,70 +141,69 @@ class _CalendarPageState extends State<CalendarPage>
                 final eventsForSelectedDate =
                     _getEventsForDay(allEvents, _selectedDate);
 
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      CustomCalendar(
+                return Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      child: CustomCalendar(
                         events: allEvents,
                         onDateSelected: (date) {
                           setState(() => _selectedDate = date);
                         },
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)!.schedule,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                FocusScope.of(context).unfocus();
-                                await Future.delayed(
-                                    const Duration(milliseconds: 100));
-
-                                if (mounted) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => EventFormPage(
-                                        selectedDate: _selectedDate,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                AppLocalizations.of(context)!.addEvent,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: EventList(
-                            events: eventsForSelectedDate,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.schedule,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              FocusScope.of(context).unfocus();
+                              await Future.delayed(
+                                  const Duration(milliseconds: 100));
+                
+                              if (mounted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EventFormPage(
+                                      selectedDate: _selectedDate,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              AppLocalizations.of(context)!.addEvent,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Expanded(
+                      child: EventList(
+                        events: eventsForSelectedDate,
+                      ),
+                    ),
+                  ],
                 );
               },
             );

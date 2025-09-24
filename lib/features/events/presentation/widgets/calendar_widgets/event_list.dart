@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:schedule_event/core/services/notification_service.dart';
 import 'package:schedule_event/core/utils/color_mapper.dart';
 import 'package:schedule_event/l10n/app_localizations.dart';
 
 import '../../../domain/entities/event.dart';
+import '../../bloc/bloc.dart';
+import '../../bloc/event.dart';
 import '../../pages/event_details_page.dart';
 
 class EventList extends StatefulWidget {
@@ -45,110 +49,141 @@ class _EventListState extends State<EventList> {
       itemCount: widget.events.length,
       itemBuilder: (context, index) {
         final event = widget.events[index];
-        return Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 12,
-              decoration: BoxDecoration(
-                color: ColorMapper.stringToColor(event.colorName),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-              ),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Dismissible(
+            key: ValueKey(event.id ?? event.hashCode),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: const Icon(Icons.delete, color: Colors.red),
             ),
-            Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: ColorMapper.stringToColor(event.colorName).withAlpha(60),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(12),
-                  bottomRight: Radius.circular(12),
-                ),
-                border: Border.all(
-                  color:
-                      ColorMapper.stringToColor(event.colorName).withAlpha(120),
-                  width: 1,
-                ),
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                title: Text(
-                  event.title,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: ColorMapper.stringToColor(event.colorName),
-                      ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      event.description,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: ColorMapper.stringToColor(event.colorName)),
+            onDismissed: (direction) async {
+              final eventToDelete = widget.events[index];
+              if (eventToDelete.id != null) {
+                await NotificationService().cancelNotification(eventToDelete.id!);
+                context
+                    .read<EventBloc>()
+                    .add(DeleteExistingEvent(eventToDelete.id!));
+              }
+              setState(() {
+                widget.events.removeAt(index);
+              });
+            },
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: ColorMapper.stringToColor(event.colorName),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.access_time_filled,
-                          size: 16,
-                          color: ColorMapper.stringToColor(event.colorName),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          event.timeRange,
-                          style: TextStyle(
-                            color: ColorMapper.stringToColor(event.colorName),
-                            fontSize: 12,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: ColorMapper.stringToColor(event.colorName)
+                        .withAlpha(60),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                    border: Border.all(
+                      color: ColorMapper.stringToColor(event.colorName)
+                          .withAlpha(120),
+                      width: 1,
+                    ),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    title: Text(
+                      event.title,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        if (event.location != null &&
-                            event.location!.isNotEmpty) ...[
-                          Icon(
-                            Icons.location_on,
-                            size: 16,
                             color: ColorMapper.stringToColor(event.colorName),
                           ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              event.location!,
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          event.description,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                  color: ColorMapper.stringToColor(
+                                      event.colorName)),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time_filled,
+                              size: 16,
+                              color: ColorMapper.stringToColor(event.colorName),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              event.timeRange,
                               style: TextStyle(
                                 color:
                                     ColorMapper.stringToColor(event.colorName),
-                                fontWeight: FontWeight.bold,
                                 fontSize: 12,
+                                fontWeight: FontWeight.bold,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 16),
+                            if (event.location != null &&
+                                event.location!.isNotEmpty) ...[
+                              Icon(
+                                Icons.location_on,
+                                size: 16,
+                                color:
+                                    ColorMapper.stringToColor(event.colorName),
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  event.location!,
+                                  style: TextStyle(
+                                    color: ColorMapper.stringToColor(
+                                        event.colorName),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ],
                     ),
-                  ],
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EventDetailsPage(
+                            event: event,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EventDetailsPage(
-                        event: event,
-                      ),
-                    ),
-                  );
-                },
-              ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
